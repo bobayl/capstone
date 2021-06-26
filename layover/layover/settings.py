@@ -70,6 +70,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'layover.wsgi.application'
 
+AUTH_USER_MODEL = "layover_app.User"
+
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
