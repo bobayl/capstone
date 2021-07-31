@@ -4,13 +4,23 @@
 {% block body %}
 
 {% if user.is_authenticated %}
-  <h1>logged in users:</h1>
+
   <div id="destinations">
-    Destinations Overview
+    <h2>Destinations</h2>
+    <div id="destination_select_container" class="">
+      <select id="destination_selector" class="form-select" aria-label="Default select example">
+        <option selected>Select Destination</option>
+        <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3">Three</option>
+      </select>
+    </div>
+    <div id="destinations_container" class="">
+    </div>
   </div>
 
   <div id="places">
-    Places Overview
+    <h2 id="destination_title"></h2>
   </div>
 
   <div id="place_details">
@@ -19,19 +29,95 @@
 
   <div id="add_new">
     <h2>Add new Place</h2>
-    <div class="input-group mb-3" id="search_frame">
-      <input id="pac-input" type="text" class="form-control" aria-label="Sizing example input" placeholder="Search Location" aria-describedby="inputGroup-sizing-default">
-      <span class="input-group-text" id="inputGroup-sizing-default">Add Place</span>
+    <div id="search_frame" class="input-group mb-3">
+      <input id="pac-input" type="input" class="form-control" placeholder="Search Location" aria-label="Recipient's username" aria-describedby="button-addon2">
+      <button class="btn btn-outline-secondary" type="button" id="place_add_button1" disabled >Add Place</button>
+    </div>
+    <div id="place_add_success" class="alert alert-success" role="alert">
+      Place successfully added. Thanks for contribution!
+    </div>
+    <div id="place_exists" class="alert alert-warning" role="alert">
+      Place already exists in our database.
+    </div>
+    <div id="place_form">
+      <form class="" id="new_place_form">
+        {{ place_form.as_p }}
+        <button class="btn btn-secondary" type="button" id="place_add_button2" disabled >Add Place</button>
+      </form>
     </div>
     <div id="map">map div</div>
     <div id="infowindow-content">
       <span id="place-name" class="title"></span><br />
       <span id="place-address"></span>
     </div>
+
+
+    <!-- New Subcategory Modal -->
+    <div class="modal fade" id="subcategory_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add New Subcategory</h5>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col">
+                <input id="modal_category" type="text" class="form-control" required="required" placeholder="Category" aria-label="" disabled>
+              </div>
+              <div class="col">
+                <input id="new_subcategory" type="text" class="form-control" required="required" placeholder="New Subcategory" aria-label="" maxlength="15">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" id="save_subcategory" class="btn btn-primary">Save Subcategory</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="start_page" class="">
+    <h1>Here comes the start page</h1>
+  </div>
+
+  <!-- New Destination Modal -->
+  <div class="modal fade" id="new_destination_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">New Destination</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="add_destination_form" class="" action="{% url 'layover_app:add_destination' %}" method="post">
+            <div class="row g-3">
+              <div class="col">
+                <input id="new_destination_name" name="new_destination_name" type="text" class="form-control" required="required" placeholder="Destination" aria-label="" maxlength="20">
+              </div>
+              <div class="col">
+                <input id="new_destination_iata" name="new_destination_iata" type="text" class="form-control" required="required" placeholder="IATA 3-letter Code" aria-label="" maxlength="3">
+              </div>
+            </div>
+            <div class="alert alert-danger row g-3" id="destination_conflict" role="alert" style="display: none">
+              Sorry, this destination already exists in our collection.
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="save_destination" type="button" class="btn btn-primary" >Save Destination</button>
+        </div>
+      </div>
+    </div>
   </div>
 
 {% else %}
-  <h1>not logged in users:</h1>
+
+  <div id="start_page" class="">
+    <h1>Here comes the start page</h1>
+  </div>
 
   <div id="destinations">
     Destinations Overview
@@ -39,14 +125,11 @@
 {% endif %}
 
 
-
-
-
 {% endblock %}
 
 {% block script %}
   <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCm2UpDo7a6be_6kMwoxT4Ky5d-XMP24Tc&callback=initMap&libraries=places&v=weekly"
+  <script src="https://maps.googleapis.com/maps/api/js?key=myAPI_Key&callback=initMap&libraries=places&v=weekly"
     async
   ></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>

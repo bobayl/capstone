@@ -12,13 +12,13 @@
     </div>
     {% endif %}
 
-    <form action="{% url 'register' %}" method="post" id="registration_form">
+    <form action="{% url 'layover_app:register' %}" method="post" id="registration_form">
         {% csrf_token %}
         <div class="form-group">
             <input class="form-control" autofocus type="text" name="username" placeholder="Username">
         </div>
         <div class="form-group">
-            <input class="form-control" type="email" name="email" placeholder="Email Address">
+            <input id="edw_email" class="form-control" type="email" name="email" placeholder="Edelweiss Email Address">
         </div>
         <div class="form-group">
             <input class="form-control" type="password" name="password" placeholder="Password">
@@ -30,10 +30,26 @@
     </form>
 
     <div class="login_register">
-      Already have an account? <a href="{% url 'login_view' %}">Log In here.</a>
+      Already have an account? <a href="{% url 'layover_app:login_view' %}">Log In here.</a>
     </div>
   </div>
 
+{% endblock %}
 
+{% block script %}
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector("#edw_email").addEventListener('change', () => {
+      let email_field = document.querySelector("#edw_email");
+      let email = email_field.value;
+      let email_end = email.slice(-17);
+      if (email_end != "@flyedelweiss.com") {
+        email_field.style = "border-color: red; color: red";
+      } else {
+        email_field.style = "border-color: lightgrey; color: black";
+      }
+    });
+  });
 
+</script>
 {% endblock %}

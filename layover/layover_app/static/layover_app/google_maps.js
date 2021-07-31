@@ -15,8 +15,9 @@
 // parameter when you first load the API. For example:
 // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
-// Define variables:
-var place_name;
+// Declare an empty object for the place:
+const new_place = {};
+
 
 function initMap() {
   //console.log("initMap() called");
@@ -29,7 +30,17 @@ function initMap() {
   const biasInputElement = document.getElementById("use-location-bias");
   const strictBoundsInputElement = document.getElementById("use-strict-bounds");
   const options = {
-    //fields: ["formatted_address", "geometry", "name"],
+    fields: [
+      "name",
+      "formatted_address",
+      "rating",
+      "place_id",
+      "international_phone_number",
+      "website",
+      "url",
+      "business_status",
+      "geometry"
+    ],
     origin: map.getCenter(),
     strictBounds: false,
     types: ["establishment"],
@@ -49,22 +60,33 @@ function initMap() {
     anchorPoint: new google.maps.Point(0, -29),
   });
   autocomplete.addListener("place_changed", () => {
+    document.querySelector('#place_add_success').style.display = "none";
+    document.querySelector('#place_exists').style.display = "none";
     infowindow.close();
     marker.setVisible(false);
     const place = autocomplete.getPlace();
-    //console.log(place);
-    place_name = place.name;
-    console.log(place.name);
-    console.log(place.rating);
-    console.log(place.place_id);
-    console.log(place.formatted_address);
-    console.log(place.website);
-    console.log(place.international_phone_number);
+
+    // Check if the place already exists in the database:
+    let exist_route = `place_exists/${place.place_id}`;
+    fetch(exist_route)
+    .then(response => {
+      if (response.status == 202){
+        // Call function to fill the form with the selected place:
+        fill_form(place);
+        fill_place(place);
+        document.querySelector('#place_form').style.display = "block";
+      } else {
+        document.querySelector('#place_exists').style.display = "block";
+      }
+    })
+
+
+
 
     if (!place.geometry || !place.geometry.location) {
       // User entered the name of a Place that was not suggested and
       // pressed the Enter key, or the Place Details request failed.
-      window.alert("No details available for input: '" + place.name + "'");
+      window.alert("Please select a place from the dropdown menue");
       return;
     }
 
@@ -82,4 +104,23 @@ function initMap() {
       place.formatted_address;
     infowindow.open(map, marker);
   });
+}
+
+// When place is selected from dropdown, the form will be pre-populated:
+function fill_form(place) {
+  document.getElementById("id_place_name").value = place.name;
+  document.getElementById("id_place_address").value = place.formatted_address;
+  document.getElementById("id_place_phone").value = place.international_phone_number;
+  document.getElementById("id_place_website").value = place.website;
+}
+// The "new_place"-object is completed with all the place information
+function fill_place(place) {
+  new_place.place_name = place.name;
+  new_place.place_website = place.website;
+  new_place.place_google_id = place.place_id;
+  new_place.place_rating = place.rating;
+  new_place.place_address = place.formatted_address;
+  new_place.place_phone = place.international_phone_number;
+  new_place.place_googlemaps = place.url;
+  new_place.place_status = place.business_status;
 }
