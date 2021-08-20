@@ -14,10 +14,12 @@
 // This example requires the Places library. Include the libraries=places
 // parameter when you first load the API. For example:
 // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+const api_key = "API_KEY";
 
 // Declare an empty object for the place:
 const new_place = {};
-
+// Variable for the selected title image of a new place:
+var title_image_url = "";
 
 function initMap() {
   //console.log("initMap() called");
@@ -65,23 +67,62 @@ function initMap() {
     infowindow.close();
     marker.setVisible(false);
     const place = autocomplete.getPlace();
+    console.log(place);
+
+    /////
+    // Get photo references:
+    /////
 
     // Check if the place already exists in the database:
     let exist_route = `place_exists/${place.place_id}`;
     fetch(exist_route)
     .then(response => {
       if (response.status == 202){
+
         // Call function to fill the form with the selected place:
         fill_form(place);
         fill_place(place);
+        document.querySelector('#place_images_for_selection_container').style.display = "block";
         document.querySelector('#place_form').style.display = "block";
+
+        // Call the images:
+        const place_photos = [];
+        const service = new window.google.maps.places.PlacesService(map);
+        service.getDetails(
+          {
+            placeId: `${place.place_id}`
+          },
+          (data, status) => {
+            if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+              data.photos &&
+                data.photos.forEach(photo => {
+                  place_photos.push(photo.getUrl());
+                });
+
+                //display the photos:
+                document.querySelector('#place_images_for_selection').innerHTML = "";
+                for (let i=0; i<place_photos.length; i++) {
+                  let place_photo_tile = document.createElement('div');
+                  place_photo_tile.className = "card shadow-sm";
+                  tile_image = document.createElement('img');
+                  tile_image.src = `${place_photos[i]}`;
+                  tile_image.className = "card-img-top";
+                  tile_image.alt = "Image " + (i+1);
+                  tile_image.onclick = function() {
+                    title_image_url = this.src;
+                    //console.log(title_image_url);
+                    document.querySelector('#selected_image').innerHTML = "Your image selection: " + this.alt;
+                  }
+                  place_photo_tile.appendChild(tile_image);
+                  document.querySelector('#place_images_for_selection').appendChild(place_photo_tile);
+                }
+              }
+            });
+
       } else {
         document.querySelector('#place_exists').style.display = "block";
       }
     })
-
-
-
 
     if (!place.geometry || !place.geometry.location) {
       // User entered the name of a Place that was not suggested and

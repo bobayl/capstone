@@ -29,7 +29,7 @@ function show_start_page() {
 }
 
 //************************************
-// Show the destination overview:
+// Show the destinations overview:
 //************************************
 function show_destinations() {
   // Display the destinations div:
@@ -83,7 +83,7 @@ function show_destinations() {
     }
     // Reset the selector in the background:
     document.querySelector('#destination_selector').options[0].selected = "selected";
-    
+
     // Clear destinations grid:
     document.querySelector('#destinations_container').innerHTML = "";
     // Loop over the destinations:
@@ -165,9 +165,9 @@ function save_new_destination(){
   }
 }
 
-//************************************
+//************************************************************************
 // Function to update the destinations in the destination selector:
-//************************************
+//************************************************************************
 function update_destination_selector(){
   // Asynchronously adjust the destination selector:
   fetch('show_destinations')
@@ -215,50 +215,165 @@ function show_destination(destination_id) {
     let places = data["places"];
     let categories = data["categories"];
 
-    // Create destination title:
+    // Fill destination title:
     document.querySelector("#destination_title").innerHTML = destination["destination_name"];
-    // Create one container for all the categories:
-    let categories_container = document.createElement('div');
-    // Loop over all the categories:
-    for (category of categories){
-      // Create one container per category:
-      let category_container = document.createElement('div');
-      let category_title = document.createElement('h4');
-      category_title.innerHTML = category["category_name"];
-      category_container.appendChild(category_title);
-      // Create one container per subcategory:
-      for (subcategory of category["subcategories"]){
-        let subcategory_container = document.createElement('div');
-        let subcategory_title = document.createElement('h5');
-        subcategory_title.innerHTML = subcategory;
-        subcategory_container.appendChild(subcategory_title);
-        for (place of places){
-          if (place["place_subcategory"] == subcategory){
-            let place_container = document.createElement('div');
-            let place_title = document.createElement('h6');
-            place_title.innerHTML = place.place_name;
-            place_container.appendChild(place_title);
-            subcategory_container.appendChild(place_container);
-          }
-        }
-        category_container.appendChild(subcategory_container);
-      }
-      categories_container.appendChild(category_container);
-    }
-    document.querySelector("#places").appendChild(categories_container);
+
+    // List all places:
+    list_places(places, categories);
   });
 }
+//************************************
+// Lists all the places in the destination view:
+//************************************
+function list_places(places, categories) {
+
+  // Loop over the categories:
+  for (category of categories) {
+    // Create a category container:
+    let category_container = document.createElement('div');
+    // Create category title:
+    let category_title = document.createElement('h2');
+    category_title.className = "fw-light";
+    category_title.innerHTML = category.category_name;
+    category_container.appendChild(category_title);
+    // Create the card group for the category:
+    let card_group = document.createElement('div');
+    card_group.className = "card-group";
+
+    // Loop over the places:
+    for (place of places) {
+      if (place.place_category === category.category_name) {
+        // Create the card for each place:
+        let place_card = document.createElement('div');
+        place_card.className = "card shadow-sm";
+        place_image = document.createElement('img');
+        place_image.src = `${place.place_image_url}`;
+        place_image.className = "card-img-top";
+        place_image.alt = "...";
+        place_card.appendChild(place_image);
+        let place_body = document.createElement('div');
+        place_body.className = "card-body";
+        let place_title = document.createElement('h5');
+        place_title.claclassNamess = "card-title";
+        place_title.innerHTML = place.place_name;
+        place_body.appendChild(place_title);
+        let place_subtitle = document.createElement('h6');
+        place_subtitle.innerHTML = place.place_subcategory;
+        place_body.appendChild(place_subtitle);
+        place_card.appendChild(place_body);
+        let place_footer = document.createElement('div');
+        place_footer.className = "card-footer";
+        let footer_text = document.createElement('small');
+        footer_text.className = "text-muted";
+        footer_text.innerHTML = "added on " + place.place_date_added + " by " + place.place_author;
+        place_footer.appendChild(footer_text);
+        place_card.appendChild(place_footer);
+        // Add click event to the place_card:
+        place_card.onmouseover = function(){
+          this.style = "opacity: 50%";
+        }
+        place_card.onmouseout = function(){
+          this.style = "opacity: 100%";
+        }
+        place_card.id = place.id;
+        place_card.name = place.place_name;
+
+        place_card.addEventListener('click', () => {
+          // Load the place:
+          load_place(place_card.id);
+        })
+        card_group.appendChild(place_card);
+      }
+    }
+    category_container.appendChild(card_group);
+    document.querySelector('#places').appendChild(category_container);
+  }
+}
+
+//************************************
+// Load place function:
+//************************************
+function load_place(place_id){
+
+  // Display the place details block:
+  document.querySelector('#start_page').style.display = "none";
+  document.querySelector('#destinations').style.display = "none";
+  document.querySelector('#add_new').style.display = "none";
+  document.querySelector('#places').style.display = "none";
+  document.querySelector('#place_details').style.display = "block";
+
+  // Fetch the place details:
+  fetch(`load_place/${place_id}`)
+  .then(response => response.json())
+  .then(data => {
+    let place = data.place;
+    //console.log(place);
+    // Update the title:
+    document.querySelector('#place_title').innerHTML = place.place_name;
+    // Update the place author:
+    document.querySelector('#place_author').innerHTML = `Place selected by ${place.place_author}`;
+    // Setting the background image:
+    document.querySelector('#place_header').style.backgroundImage = `url(${place.place_image_url})`;
+
+    // Update place info:
+    if (place.place_infos.length > 5) {
+      document.querySelector('#place_info').innerHTML = place.place_infos;
+    } else {
+      document.querySelector('#place_info').innerHTML = "No place description by the author yet.";
+    }
+
+    document.querySelector('#place_name').innerHTML = place.place_name;
+    document.querySelector('#place_address').innerHTML = "  " + place.place_address;
+    document.querySelector('#place_website').innerHTML = "  " + place.place_website;
+    document.querySelector('#place_phone').innerHTML = "  " + place.place_phone;
+    document.querySelector('#place_category').innerHTML = "Category:  " + place.place_category;
+    document.querySelector('#place_subcategory').innerHTML = "Subcategory  " + place.place_subcategory;
+    document.querySelector('#place_googlemaps').href = "  " + place.place_googlemaps;
+    document.querySelector('#place_author2').innerHTML = "  " + place.place_author;
+
+    // Load the images of the place:
+    // Call the images:
+    const place_photos = [];
+    const service = new window.google.maps.places.PlacesService(map);
+    service.getDetails(
+      {
+        placeId: `${place.place_id}`
+      },
+      (data, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          data.photos &&
+            data.photos.forEach(photo => {
+              place_photos.push(photo.getUrl());
+            });
+
+            //display the photos:
+            // Loop over the images:
+            for (photo of place_photos){
+              console.log("in here");
+              let place_photo_tile = document.createElement('div');
+              let place_photo = document.createElement('img');
+              place_photo.src = `${photo}`;
+              place_photo_tile.append(place_photo);
+              document.querySelector('#place_details_images').append(place_photo_tile);
+            }
+          }
+        });
+  })
+}
+
 
 //************************************
 // Shows the add_place view to let the user to search Google Maps places:
 //************************************
 function add_place() {
   document.querySelector('#pac-input').value = "";
+  document.querySelector('#place_details').style.display = "none";
   document.querySelector('#places').style.display = "none";
   document.querySelector('#start_page').style.display = "none";
   document.querySelector('#destinations').style.display = "none";
   document.querySelector('#add_new').style.display = "block";
   document.querySelector('#place_form').style.display = "none";
+  document.querySelector('#place_images_for_selection_container').style.display = "none";
   document.querySelector('#place_add_success').style.display = "none";
   document.querySelector('#place_exists').style.display = "none";
 
@@ -422,8 +537,6 @@ function add_subcategory() {
       return response.json();
     })
     .then(data => {
-      console.log(data);
-
       sub_cat_modal.hide();
       update_subcategory();
     })
@@ -439,6 +552,7 @@ function submit_place(place) {
   place.place_category = document.getElementById("id_place_category").value;
   place.place_subcategory = document.getElementById("id_place_subcategory").value;
   place.place_infos = document.getElementById("id_place_infos").value;
+  place.place_image_url = title_image_url;
 
   // Check if destination and category are selected:
   let destination_field = document.getElementById("id_place_destination");
@@ -468,6 +582,7 @@ function submit_place(place) {
       document.querySelector("#new_place_form").reset();
       document.querySelector("#pac-input").value = "";
       document.querySelector("#place_form").style.display = "none";
+      document.querySelector('#place_images_for_selection_container').style.display = "none";
     });
   }
 }

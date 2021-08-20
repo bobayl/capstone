@@ -21,6 +21,17 @@ def index(request):
 
 @login_required
 @csrf_exempt
+def load_place(request, place_id):
+    if request.method == "GET":
+        place = Place.objects.get(pk = place_id)
+        place = place.serialize()
+        print(place)
+        return JsonResponse({"place": place}, status=200)
+    else:
+        return JsonResponse({"error": "GET request required"}, status=400)
+
+@login_required
+@csrf_exempt
 def add_subcategory(request):
     if request.method == "POST":
         # Load the data:
@@ -143,12 +154,13 @@ def add_place(request):
         place_googlemaps = place.get("place_googlemaps")
         place_author = request.user
         place_infos = place.get("place_infos")
+        place_image_url = place.get("place_image_url")
 
         # Check if place already in database:
         if len(Place.objects.filter(place_google_id = place_google_id)) > 0:
             return JsonResponse({"message": "Sorry, this place already exists in our database."}, status=409)
         else:
-            new_place = Place(place_name = place_name, place_destination = place_destination, place_category = place_category, place_subcategory = place_subcategory, place_google_id = place_google_id, place_rating = place_rating, place_address = place_address, place_phone = place_phone, place_website = place_website, place_googlemaps = place_googlemaps, place_author = place_author, place_infos = place_infos, place_status = True)
+            new_place = Place(place_name = place_name, place_destination = place_destination, place_category = place_category, place_subcategory = place_subcategory, place_google_id = place_google_id, place_address = place_address, place_phone = place_phone, place_website = place_website, place_googlemaps = place_googlemaps, place_author = place_author, place_infos = place_infos, place_image_url = place_image_url, place_status = True)
             new_place.save()
 
             return JsonResponse({"message": "Successully submitted place. Thanks."}, status=201)

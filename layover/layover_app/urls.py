@@ -16,5 +16,6 @@ urlpatterns = [
     path("load_subcategories/<int:category_id>", views.load_subcategories, name="load_subcategories"),
     path("place_exists/<str:place_id>", views.place_exists, name="place_exists"),
     path("add_destination", views.add_destination, name="add_destination"),
-    path("add_subcategory", views.add_subcategory, name="add_subcategory")
+    path("add_subcategory", views.add_subcategory, name="add_subcategory"),
+    path("load_place/<str:place_id>", views.load_place, name="load_place")
 ]

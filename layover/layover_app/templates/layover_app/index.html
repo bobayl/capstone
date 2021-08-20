@@ -6,39 +6,103 @@
 {% if user.is_authenticated %}
 
   <div id="destinations">
-    <h2>Destinations</h2>
-    <div id="destination_select_container" class="">
-      <select id="destination_selector" class="form-select" aria-label="Default select example">
-        <option selected>Select Destination</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
-      </select>
-    </div>
-    <div id="destinations_container" class="">
+    <section class="py-5 text-center container">
+      <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+          <h1 class="fw-light">Our Destinations</h1>
+          <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+          <p>
+            <a href="#" class="btn btn-primary my-2">Main call to action</a>
+            <a href="#" class="btn btn-secondary my-2">Secondary action</a>
+            <div id="destination_select_container" class="">
+              <select id="destination_selector" class="form-select" aria-label="Default select example">
+                <option selected>Select Destination</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+              </select>
+            </div>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="album py-5 bg-light">
+      <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="destinations_container">
+        </div>
+      </div>
     </div>
   </div>
 
   <div id="places">
-    <h2 id="destination_title"></h2>
+    <h1 class="fw-light" id="destination_title"></h1>
   </div>
 
   <div id="place_details">
-    Place details
+    <div class="py-5 text-center container" id="place_header">
+      <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto" id="place_title_container">
+          <h1 class="fw-light" id="place_title">Example Place</h1>
+          <h5 id="place_author"></h5>
+          <p class="lead text-muted" id="place_info">No place description by the author yet.</p>
+          <p>
+            <a href="#" class="btn btn-primary my-2">Main call to action</a>
+            <a href="#" class="btn btn-secondary my-2">Secondary action</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="place_data">
+      <ul class="list-group" id="place_info_list">
+        <li class="list-group-item" id="place_name" style="font-weight: bold">name</li>
+        <li class="list-group-item"><span><i class="bi-pin-map"></i></span><span id="place_address"></span></li>
+        <li class="list-group-item"><span><i class="bi-globe2"></i></span><span id="place_website"></span></li>
+        <li class="list-group-item"><span><i class="bi-telephone"></i></span><span id="place_phone"></span></li>
+        <li class="list-group-item" id="place_category">category</li>
+        <li class="list-group-item" id="place_subcategory">subcategory</li>
+        <li class="list-group-item">
+          <span><i class="bi-google"></i></span>
+          <span>
+            <a id="place_googlemaps" href="#" target="_blank">See on Google Maps</a>
+          </span>
+        </li>
+        <li class="list-group-item"><span><i class="bi-file-earmark-person"></i></span><span id="place_author2"></span></li>
+      </ul>
+    </div>
+
+    <div class="album py-5 bg-light">
+      <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="place_details_images">
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="add_new">
-    <h2>Add new Place</h2>
+    <h2 class="fw-light">Add new Place</h2>
     <div id="search_frame" class="input-group mb-3">
       <input id="pac-input" type="input" class="form-control" placeholder="Search Location" aria-label="Recipient's username" aria-describedby="button-addon2">
       <button class="btn btn-outline-secondary" type="button" id="place_add_button1" disabled >Add Place</button>
     </div>
+    <!-- Alerts -->
     <div id="place_add_success" class="alert alert-success" role="alert">
       Place successfully added. Thanks for contribution!
     </div>
     <div id="place_exists" class="alert alert-warning" role="alert">
       Place already exists in our database.
     </div>
+    <!-- Images for selection -->
+    <div class="album py-5 bg-light" id="place_images_for_selection_container">
+      <h5 class="fw-light">Please select your favorite image below to be used as the title image.</h5>
+      <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="place_images_for_selection">
+        </div>
+      </div>
+      <h5 class="fw-light" id="selected_image"></h5>
+    </div>
+
     <div id="place_form">
       <form class="" id="new_place_form">
         {{ place_form.as_p }}
@@ -79,7 +143,7 @@
   </div>
 
   <div id="start_page" class="">
-    <h1>Here comes the start page</h1>
+    <h1 class="fw-light">Start Page: Welcome to Layover</h1>
   </div>
 
   <!-- New Destination Modal -->
@@ -129,7 +193,7 @@
 
 {% block script %}
   <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=myAPI_Key&callback=initMap&libraries=places&v=weekly"
+  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap&libraries=places&v=weekly"
     async
   ></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
