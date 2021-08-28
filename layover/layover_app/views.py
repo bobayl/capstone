@@ -1,4 +1,5 @@
 import json
+import urllib.request
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
@@ -8,9 +9,16 @@ from django.forms import ModelForm
 from django import forms
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
+from django.core.files import File
+from apiclient.discovery import build
 
 from .models import User, Destination, Place, Category, Subcategory
 
+# GOOGLE API-Key:
+api_key = 'my_api_key'
+# Google Custom Search Engine ID:
+cx = 'my_cse'
 
 # Create your views here.
 
@@ -25,7 +33,6 @@ def load_place(request, place_id):
     if request.method == "GET":
         place = Place.objects.get(pk = place_id)
         place = place.serialize()
-        print(place)
         return JsonResponse({"place": place}, status=200)
     else:
         return JsonResponse({"error": "GET request required"}, status=400)
@@ -57,7 +64,7 @@ def add_destination(request):
         # Load the data:
         data = json.loads(request.body)
         destination = data.get("destination")
-        print(destination)
+
         # Get the new destination data:
         new_destination_name = destination.get("destination_name")
         new_destination_iata = destination.get("destination_iata")
@@ -66,6 +73,7 @@ def add_destination(request):
         new_destination_iata = new_destination_iata.upper()
         print(new_destination_name)
         print(new_destination_iata)
+
         # Check if the destination already exists (based on name and/or IATA code):
         check_destination = Destination.objects.filter(destination_iata = new_destination_iata)
         if len(check_destination) > 0:
@@ -77,10 +85,69 @@ def add_destination(request):
             # Create a new Destination instance:
             new_destination = Destination(destination_name = new_destination_name, destination_iata = new_destination_iata, destination_active = True)
             new_destination.save()
+
+            # Get destination images from Google:
+            resource = build("customsearch", 'v1', developerKey=api_key).cse()
+            result = resource.list(q=f'{new_destination_name}', cx=cx, searchType='image').execute()
+            image_links = []
+            for item in result['items']:
+                image_links.append(item['link'])
+            print(image_links)
+
+            # Get the new destination-ID:
+            n = Destination.objects.get(destination_iata = new_destination_iata)
+            new_dest_id = n.id
+            print(new_dest_id)
+
             return JsonResponse({
+            "destination_id": new_dest_id,
+            "image_links": image_links,
             "success": "New destination added.",
             "status": 201
             }, status=201)
+    else:
+        return JsonResponse({"error": "POST request required."}, status=400)
+
+@login_required
+@csrf_exempt
+def save_destination_image(request, dest_id):
+    if request.method == "POST":
+        print("new destination img received")
+        # Load the data:
+        data = json.loads(request.body)
+        destination_img = data.get("destination_img")
+        print(destination_img)
+        dest_img_url = destination_img.get("url");
+
+        # Retrieve the image from the place_image_url:
+        try:
+            urllib.request.urlretrieve(dest_img_url, "dest_image")
+        except HTTPError:
+            return JsonResponse({"error": "Error occured while saving this image. Please select a different image."}, status=403)
+
+        #f = open("title_image", newline='', encoding="utf16")
+        with open("dest_image", 'rb') as f:
+            myfile = File(f)
+
+            print(myfile.name)
+            print(myfile.size)
+
+            fs = FileSystemStorage()
+            name = fs.save(myfile.name, myfile)
+            print(name)
+            url = fs.url(name)
+            print(url)
+
+        # Set the local url to the title image:
+        dest_image_url = "/layover_app" + url
+        print(dest_image_url)
+
+        # Get the respective destination model and update its img_url property:
+        d = Destination.objects.get(pk = dest_id)
+        d.destination_img_url = dest_image_url
+        d.save()
+
+        return JsonResponse({"success": "Destination image added"}, status=201)
     else:
         return JsonResponse({"error": "POST request required."}, status=400)
 
@@ -109,7 +176,6 @@ def show_destination(request, destination_id):
         # Get the categories and subcategories:
         categories = Category.objects.all()
         categories = [category.serialize() for category in categories]
-        print(f"categories: {categories}")
 
         # Get the places of the selected destination:
         places = Place.objects.filter(place_destination__id = destination_id).order_by('place_category')
@@ -155,6 +221,30 @@ def add_place(request):
         place_author = request.user
         place_infos = place.get("place_infos")
         place_image_url = place.get("place_image_url")
+
+        # Retrieve the image from the place_image_url and save it in the database:
+        # Retrieve the image from the place_image_url:
+
+        urllib.request.urlretrieve(place_image_url, "title_image")
+
+
+        #f = open("title_image", newline='', encoding="utf16")
+        with open("title_image", 'rb') as f:
+            myfile = File(f)
+
+            print(myfile.name)
+            print(myfile.size)
+
+            fs = FileSystemStorage()
+            name = fs.save(myfile.name, myfile)
+            print(name)
+            url = fs.url(name)
+            print(url)
+
+        # Set the local url to the title image:
+        place_image_url = "/layover_app" + url
+        print(place_image_url)
+
 
         # Check if place already in database:
         if len(Place.objects.filter(place_google_id = place_google_id)) > 0:
@@ -228,7 +318,6 @@ def register(request):
 class NewDestinationForm(forms.Form):
     new_destination = forms.CharField(max_length = 20)
     new_destination_iata = forms.CharField(max_length = 3)
-
 
 class PlaceForm(ModelForm):
     class Meta:

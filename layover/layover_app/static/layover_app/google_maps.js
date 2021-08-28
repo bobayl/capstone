@@ -14,7 +14,7 @@
 // This example requires the Places library. Include the libraries=places
 // parameter when you first load the API. For example:
 // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
-const api_key = "API_KEY";
+const api_key = "my_api_key";
 
 // Declare an empty object for the place:
 const new_place = {};
@@ -62,6 +62,7 @@ function initMap() {
     anchorPoint: new google.maps.Point(0, -29),
   });
   autocomplete.addListener("place_changed", () => {
+    document.querySelector("#map").style.display = "block";
     document.querySelector('#place_add_success').style.display = "none";
     document.querySelector('#place_exists').style.display = "none";
     infowindow.close();
@@ -104,7 +105,7 @@ function initMap() {
                 for (let i=0; i<place_photos.length; i++) {
                   let place_photo_tile = document.createElement('div');
                   place_photo_tile.className = "card shadow-sm";
-                  tile_image = document.createElement('img');
+                  let tile_image = document.createElement('img');
                   tile_image.src = `${place_photos[i]}`;
                   tile_image.className = "card-img-top";
                   tile_image.alt = "Image " + (i+1);

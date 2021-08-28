@@ -45,6 +45,7 @@ function show_destinations() {
   })
   .then(response => response.json())
   .then(data => {
+    console.log(data);
     // Clear the select options:
     document.querySelector('#destination_selector').innerHTML="";
 
@@ -89,9 +90,14 @@ function show_destinations() {
     // Loop over the destinations:
     for (destination of destinations){
       let destination_tile = document.createElement('div');
+      destination_tile.className = "shadow-sm p-3 mb-5 bg-body rounded";
+      let destination_image = document.createElement('img');
+      destination_image.src = `${destination.destination_img}`
+      //destination_tile.style.backgroundImage = `url(${destination.destination_img})`;
       let destination_title = document.createElement('h3');
       let destination_id = destination.id;
       destination_title.innerHTML = destination.destination_name;
+      destination_title.className = "centered";
       destination_tile.onmouseover = function(){
         this.style = "opacity: 60%; cursor: pointer";
       };
@@ -104,8 +110,9 @@ function show_destinations() {
       destination_title.onmouseover = function() {
         this.style = "cursor: pointer";
       };
-      destination_tile.append(destination_title);
-      document.querySelector('#destinations_container').append(destination_tile);
+      destination_tile.appendChild(destination_image);
+      destination_tile.appendChild(destination_title);
+      document.querySelector('#destinations_container').appendChild(destination_tile);
     }
   });
 }
@@ -117,8 +124,15 @@ function save_new_destination(){
   // Pop up the modal to enter the new destination:
   const destination_modal = new bootstrap.Modal(document.getElementById('new_destination_modal'), backdrop=true);
   destination_modal.show();
+  // Hide the images section of the modal:
+  document.querySelector('#destination_images_modal_container').style.display = "none";
+  document.querySelector('#image_error').style.display = "none";
+  document.querySelector('#spinner').style.display = "none";
+  document.querySelector('#destination_conflict').style.display = "none";
   // Clear the form:
   document.querySelector('#add_destination_form').reset();
+  document.querySelector('#save_destination').innerHTML = "Next";
+  document.querySelector('#save_destination').disabled = false;
   // Force the IATA code to be all capitals:
   document.querySelector('#new_destination_iata').onkeyup = function(){
     this.value = this.value.toUpperCase();
@@ -128,6 +142,12 @@ function save_new_destination(){
 
   // Add click event listener to the submit button:
   document.querySelector('#save_destination').onclick = function() {
+    // Show the images container
+    document.querySelector('#destination_conflict').style.display = "none";
+
+    document.querySelector('#destination_images_modal_container').style.display = "block";
+    document.querySelector('#destination_images_modal').style.display = "block";
+    document.querySelector('#destination_images_modal').innerHTML = "";
     // Read the entered values:
     // Fill the object:
     new_destination.destination_name = document.querySelector('#new_destination_name').value;
@@ -146,23 +166,96 @@ function save_new_destination(){
       })
     })
     .then(response => {
+      // Check if the destination already exists in the database:
       if (response.status == 409) {
         document.querySelector('#destination_conflict').style.display = "block";
       }
       return response.json();
     })
     .then(data => {
+      console.log(data);
       if (data["status"] === 201) {
-        if (document.querySelector('#destinations').style.display == "block"){
-          show_destinations();
-          destination_modal.hide();
-        } else {
-          update_destination_selector();
-          destination_modal.hide();
+
+        // If the place is successfully created with name and iata code, go to the destination image picker:
+        //display the photos:
+        let image_links = data.image_links;
+        let dest_id = data.destination_id;
+        console.log(dest_id);
+        document.querySelector('#save_destination').innerHTML = "Save Destination";
+        document.querySelector('#destination_images_modal').innerHTML = "";
+
+
+        // Loop over the image links:
+        document.querySelector('#destination_images_modal').style.display = "block";
+
+        for (let i=0; i<image_links.length; i++) {
+          let dest_photo_tile = document.createElement('div');
+          dest_photo_tile.className = "card shadow-sm";
+          let tile_image = document.createElement('img');
+          tile_image.src = `${image_links[i]}`;
+          tile_image.className = "card-img-top";
+          tile_image.alt = "Image " + (i+1);
+          tile_image.id = "image" + i;
+          tile_image.onclick = function() {
+            title_image_url = this.src;
+            for (let j=0; j<image_links.length; j++){
+              document.querySelector(`#image${j}`).style = "border: none";
+            }
+            this.style = "border: solid";
+            document.querySelector('#save_destination').onclick = function() {
+              // On submitting: Disable submit button, grey out content, show spinner:
+              ///// TODO
+              this.disabled = true;
+
+
+              save_destination_image(title_image_url, dest_id, destination_modal);
+            }
+          }
+          dest_photo_tile.appendChild(tile_image);
+          document.querySelector('#destination_images_modal').appendChild(dest_photo_tile);
         }
       }
     });
   }
+}
+function save_destination_image(img_url, dest_id, dest_modal) {
+  console.log("saving destination image...");
+  console.log(img_url);
+  document.querySelector('#spinner').style.display = "block";
+
+  const destination_img = {};
+  destination_img.url = img_url;
+
+  // onclick send the selected image url to the server:
+  document.querySelector('#spinner').style.display = "block";
+  let route = `save_destination_image/${dest_id}`;
+  fetch(route, {
+    method: 'POST',
+    body: JSON.stringify({
+      destination_img: destination_img
+    })
+  })
+  .then(response => {
+    if (response.status != 201) {
+      document.querySelector('#spinner').style.display = "none";
+      document.querySelector('#image_error').style.display = "block";
+      document.querySelector('#save_destination').disabled = false;
+    }
+    return response.json();
+  })
+  .then(data => {
+    document.querySelector('#spinner').style.display = "block";
+    console.log(data);
+    // If the destination is added from the destinations page:
+    if (document.querySelector('#destinations').style.display == "block"){
+      show_destinations();
+      dest_modal.hide();
+    // If the destination is added from the add place page:
+    } else {
+      update_destination_selector();
+      dest_modal.hide();
+    }
+  });
 }
 
 //************************************************************************
@@ -196,7 +289,6 @@ function update_destination_selector(){
   });
 }
 
-
 //************************************
 // Show the places of a destination:
 //************************************
@@ -211,6 +303,7 @@ function show_destination(destination_id) {
   })
   .then(response => response.json())
   .then(data => {
+    console.log(data);
     let destination = data["destination"];
     let places = data["places"];
     let categories = data["categories"];
@@ -222,9 +315,6 @@ function show_destination(destination_id) {
     list_places(places, categories);
   });
 }
-//************************************
-// Lists all the places in the destination view:
-//************************************
 function list_places(places, categories) {
 
   // Loop over the categories:
@@ -254,7 +344,7 @@ function list_places(places, categories) {
         let place_body = document.createElement('div');
         place_body.className = "card-body";
         let place_title = document.createElement('h5');
-        place_title.claclassNamess = "card-title";
+        place_title.className = "card-title";
         place_title.innerHTML = place.place_name;
         place_body.appendChild(place_title);
         let place_subtitle = document.createElement('h6');
@@ -294,6 +384,7 @@ function list_places(places, categories) {
 // Load place function:
 //************************************
 function load_place(place_id){
+  console.log("loading place...");
 
   // Display the place details block:
   document.querySelector('#start_page').style.display = "none";
@@ -314,6 +405,8 @@ function load_place(place_id){
     document.querySelector('#place_author').innerHTML = `Place selected by ${place.place_author}`;
     // Setting the background image:
     document.querySelector('#place_header').style.backgroundImage = `url(${place.place_image_url})`;
+    console.log(place.place_image_url);
+
 
     // Update place info:
     if (place.place_infos.length > 5) {
@@ -325,11 +418,12 @@ function load_place(place_id){
     document.querySelector('#place_name').innerHTML = place.place_name;
     document.querySelector('#place_address').innerHTML = "  " + place.place_address;
     document.querySelector('#place_website').innerHTML = "  " + place.place_website;
+    document.querySelector('#place_website').href = place.place_website;
     document.querySelector('#place_phone').innerHTML = "  " + place.place_phone;
     document.querySelector('#place_category').innerHTML = "Category:  " + place.place_category;
-    document.querySelector('#place_subcategory').innerHTML = "Subcategory  " + place.place_subcategory;
-    document.querySelector('#place_googlemaps').href = "  " + place.place_googlemaps;
-    document.querySelector('#place_author2').innerHTML = "  " + place.place_author;
+    document.querySelector('#place_subcategory').innerHTML = "Subcategory:  " + place.place_subcategory;
+    document.querySelector('#place_googlemaps').href = place.place_googlemaps;
+    document.querySelector('#place_author2').innerHTML = "Listed by:  " + place.place_author;
 
     // Load the images of the place:
     // Call the images:
@@ -349,7 +443,6 @@ function load_place(place_id){
             //display the photos:
             // Loop over the images:
             for (photo of place_photos){
-              console.log("in here");
               let place_photo_tile = document.createElement('div');
               let place_photo = document.createElement('img');
               place_photo.src = `${photo}`;
@@ -361,21 +454,25 @@ function load_place(place_id){
   })
 }
 
-
 //************************************
 // Shows the add_place view to let the user to search Google Maps places:
 //************************************
 function add_place() {
+  document.querySelector('#add_new').style.display = "block";
+  //document.querySelector("#search_frame").style.display = "block";
+  //document.querySelector('#pac-input').style.display = "block";
+  //document.querySelector("#map").style.display = "block";
   document.querySelector('#pac-input').value = "";
   document.querySelector('#place_details').style.display = "none";
   document.querySelector('#places').style.display = "none";
   document.querySelector('#start_page').style.display = "none";
   document.querySelector('#destinations').style.display = "none";
-  document.querySelector('#add_new').style.display = "block";
   document.querySelector('#place_form').style.display = "none";
   document.querySelector('#place_images_for_selection_container').style.display = "none";
   document.querySelector('#place_add_success').style.display = "none";
   document.querySelector('#place_exists').style.display = "none";
+  document.querySelector('#place_image_error').style.display = "none";
+
 
   // Add event listener for the user selecting a place from the dropdown:
   let place_add_button1 = document.querySelector('#place_add_button1');
@@ -574,6 +671,8 @@ function submit_place(place) {
       } else if (response.status == 409){
         document.querySelector('#place_add_success').style.display = "none";
         document.querySelector('#place_exists').style.display = "block";
+      } else {
+        document.querySelector('#place_image_error').style.display = "block";
       }
       return response.json();
     })
@@ -581,7 +680,9 @@ function submit_place(place) {
       // Empty the form:
       document.querySelector("#new_place_form").reset();
       document.querySelector("#pac-input").value = "";
+      //document.querySelector("#search_frame").style.display = "none";
       document.querySelector("#place_form").style.display = "none";
+      document.querySelector("#map").style.display = "none";
       document.querySelector('#place_images_for_selection_container').style.display = "none";
     });
   }

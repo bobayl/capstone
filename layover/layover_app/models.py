@@ -13,6 +13,7 @@ class User(AbstractUser):
 class Destination(models.Model):
     destination_name = models.CharField(max_length = 60)
     destination_iata = models.CharField(max_length = 3)
+    destination_img_url = models.CharField(max_length = 1000, default = "")
     destination_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -22,7 +23,8 @@ class Destination(models.Model):
         return {
             "id": self.id,
             "destination_name": self.destination_name,
-            "destination_iata": self.destination_iata
+            "destination_iata": self.destination_iata,
+            "destination_img":self.destination_img_url
         }
 
 

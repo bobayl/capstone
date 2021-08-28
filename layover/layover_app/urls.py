@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = "layover_app"
 
@@ -17,5 +19,9 @@ urlpatterns = [
     path("place_exists/<str:place_id>", views.place_exists, name="place_exists"),
     path("add_destination", views.add_destination, name="add_destination"),
     path("add_subcategory", views.add_subcategory, name="add_subcategory"),
-    path("load_place/<str:place_id>", views.load_place, name="load_place")
+    path("load_place/<str:place_id>", views.load_place, name="load_place"),
+    path("save_destination_image/<int:dest_id>", views.save_destination_image, name="save_destination_image")
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

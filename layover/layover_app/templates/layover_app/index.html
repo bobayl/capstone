@@ -5,15 +5,16 @@
 
 {% if user.is_authenticated %}
 
+<!-- Destinations -->
   <div id="destinations">
-    <section class="py-5 text-center container">
-      <div class="row py-lg-5">
+    <section class="py-5 text-center container" id="destinations_header">
+      <div class="row py-lg-5" id="destinations_subheader">
         <div class="col-lg-6 col-md-8 mx-auto">
           <h1 class="fw-light">Our Destinations</h1>
           <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
           <p>
-            <a href="#" class="btn btn-primary my-2">Main call to action</a>
-            <a href="#" class="btn btn-secondary my-2">Secondary action</a>
+            <a href="#" class="btn btn-primary my-2" onclick="save_new_destination()">Create New Destination</a>
+            <a href="#" class="btn btn-secondary my-2">Pick Destination on Map</a>
             <div id="destination_select_container" class="">
               <select id="destination_selector" class="form-select" aria-label="Default select example">
                 <option selected>Select Destination</option>
@@ -35,10 +36,16 @@
     </div>
   </div>
 
-  <div id="places">
-    <h1 class="fw-light" id="destination_title"></h1>
+<!-- Places -->
+  <div class="album py-5 bg-light">
+    <div class="container">
+      <div id="places">
+        <h1 class="fw-light" id="destination_title"></h1>
+      </div>
+    </div>
   </div>
 
+<!-- Place Details -->
   <div id="place_details">
     <div class="py-5 text-center container" id="place_header">
       <div class="row py-lg-5">
@@ -58,7 +65,11 @@
       <ul class="list-group" id="place_info_list">
         <li class="list-group-item" id="place_name" style="font-weight: bold">name</li>
         <li class="list-group-item"><span><i class="bi-pin-map"></i></span><span id="place_address"></span></li>
-        <li class="list-group-item"><span><i class="bi-globe2"></i></span><span id="place_website"></span></li>
+        <li class="list-group-item">
+          <span><i class="bi-globe2"></i></span>
+          <span>
+            <a id="place_website" href="#" target="_blank"></a>
+          </span></li>
         <li class="list-group-item"><span><i class="bi-telephone"></i></span><span id="place_phone"></span></li>
         <li class="list-group-item" id="place_category">category</li>
         <li class="list-group-item" id="place_subcategory">subcategory</li>
@@ -80,13 +91,24 @@
     </div>
   </div>
 
+<!-- Add new place -->
   <div id="add_new">
-    <h2 class="fw-light">Add new Place</h2>
+
+    <section class="py-5 text-center container" id="destinations_header">
+      <div class="row py-lg-5" id="destinations_subheader">
+        <div class="col-lg-6 col-md-8 mx-auto">
+          <h1 class="fw-light">Add new Place</h1>
+          <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+        </div>
+      </div>
+    </section>
+
     <div id="search_frame" class="input-group mb-3">
       <input id="pac-input" type="input" class="form-control" placeholder="Search Location" aria-label="Recipient's username" aria-describedby="button-addon2">
       <button class="btn btn-outline-secondary" type="button" id="place_add_button1" disabled >Add Place</button>
     </div>
     <!-- Alerts -->
+
     <div id="place_add_success" class="alert alert-success" role="alert">
       Place successfully added. Thanks for contribution!
     </div>
@@ -94,8 +116,12 @@
       Place already exists in our database.
     </div>
     <!-- Images for selection -->
+
     <div class="album py-5 bg-light" id="place_images_for_selection_container">
       <h5 class="fw-light">Please select your favorite image below to be used as the title image.</h5>
+      <div class="alert alert-warning" role="alert" id="place_image_error">
+        Image saving problem: Please select a different one.
+      </div>
       <div class="container">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="place_images_for_selection">
         </div>
@@ -142,13 +168,14 @@
     </div>
   </div>
 
+<!-- Start page -->
   <div id="start_page" class="">
     <h1 class="fw-light">Start Page: Welcome to Layover</h1>
   </div>
 
-  <!-- New Destination Modal -->
+<!-- New Destination Modal -->
   <div class="modal fade" id="new_destination_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">New Destination</h5>
@@ -164,14 +191,26 @@
                 <input id="new_destination_iata" name="new_destination_iata" type="text" class="form-control" required="required" placeholder="IATA 3-letter Code" aria-label="" maxlength="3">
               </div>
             </div>
+          </form>
+
+          <div class="" id="destination_images_modal_container">
             <div class="alert alert-danger row g-3" id="destination_conflict" role="alert" style="display: none">
               Sorry, this destination already exists in our collection.
             </div>
-          </form>
+            <div class="alert alert-warning" role="alert" id="image_error">
+              There was a problem saving the selected image. Please select a different one.
+            </div>
+            <div class="spinner-border text-secondary centered" role="status" id="spinner">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="" id="destination_images_modal">
+            </div>
+          </div>
+
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button id="save_destination" type="button" class="btn btn-primary" >Save Destination</button>
+          <button id="cancel_new_destination" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="save_destination" type="button" class="btn btn-primary" >Next</button>
         </div>
       </div>
     </div>
@@ -193,7 +232,7 @@
 
 {% block script %}
   <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap&libraries=places&v=weekly"
+  <script src="https://maps.googleapis.com/maps/api/js?key=my_api_key&callback=initMap&libraries=places&v=weekly"
     async
   ></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
