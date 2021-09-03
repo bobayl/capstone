@@ -212,6 +212,10 @@ small {
   margin-top: 10px!important;
 }
 
+#edit_place_button {
+  margin: auto;
+}
+
 .centered {
   position: absolute;
   top: 50%;

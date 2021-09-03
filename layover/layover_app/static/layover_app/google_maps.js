@@ -14,7 +14,7 @@
 // This example requires the Places library. Include the libraries=places
 // parameter when you first load the API. For example:
 // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
-const api_key = "my_api_key";
+const api_key = "api_key";
 
 // Declare an empty object for the place:
 const new_place = {};
@@ -108,10 +108,14 @@ function initMap() {
                   let tile_image = document.createElement('img');
                   tile_image.src = `${place_photos[i]}`;
                   tile_image.className = "card-img-top";
+                  tile_image.id = "image" + i;
                   tile_image.alt = "Image " + (i+1);
                   tile_image.onclick = function() {
                     title_image_url = this.src;
-                    //console.log(title_image_url);
+                    for (let j=0; j<place_photos.length; j++){
+                      document.querySelector(`#image${j}`).style = "border: none";
+                    }
+                    this.style = "border: solid";
                     document.querySelector('#selected_image').innerHTML = "Your image selection: " + this.alt;
                   }
                   place_photo_tile.appendChild(tile_image);

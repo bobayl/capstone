@@ -79,6 +79,7 @@ class Place(models.Model):
         return {
             "id": self.id,
             "place_name": self.place_name,
+            "place_destination": self.place_destination.destination_name,
             "place_category": self.place_category.category_name,
             "place_subcategory": self.place_subcategory.subcategory,
             "place_address": self.place_address,

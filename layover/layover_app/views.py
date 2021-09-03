@@ -16,9 +16,9 @@ from apiclient.discovery import build
 from .models import User, Destination, Place, Category, Subcategory
 
 # GOOGLE API-Key:
-api_key = 'my_api_key'
+api_key = 'api_key'
 # Google Custom Search Engine ID:
-cx = 'my_cse'
+cx = '949f3af724dcd2f56'
 
 # Create your views here.
 
@@ -27,15 +27,67 @@ def index(request):
         "place_form": PlaceForm()
     })
 
-@login_required
+
 @csrf_exempt
 def load_place(request, place_id):
     if request.method == "GET":
         place = Place.objects.get(pk = place_id)
-        place = place.serialize()
-        return JsonResponse({"place": place}, status=200)
+        place_serialized = place.serialize()
+
+        if place.place_author == request.user:
+            is_editable = True
+        else:
+            is_editable = False
+        return JsonResponse({"place": place_serialized, "is_editable": is_editable}, status=200)
     else:
         return JsonResponse({"error": "GET request required"}, status=400)
+
+@login_required
+@csrf_exempt
+def update_destinations_and_categories(request):
+    if request.method == "POST":
+        return JsonResponse({"error": "GET request required."}, status=400)
+    else:
+        destinations = Destination.objects.all().order_by('destination_name')
+        destinations = [destination.serialize() for destination in destinations]
+        categories = Category.objects.all()
+        categories = [category.serialize() for category in categories]
+        return JsonResponse({"destinations": destinations, "categories": categories}, status=200)
+
+@login_required
+@csrf_exempt
+def update_place(request, place_id):
+    if request.method == "GET":
+        return JsonResponse({"error": "POST request required"}, status=400)
+    else:
+        print("post request new destination received")
+        # Load the data:
+        data = json.loads(request.body)
+        update = data.get("updated_place")
+
+        # Get the updated data:
+        place_destination = update.get("dest_update")
+        place_category = update.get("cat_update")
+        place_subcategory = update.get("subcat_update")
+        place_infos = update.get("infos_update")
+
+        # Get the place object:
+        place = Place.objects.get(id=place_id)
+        # Get the destination and category objects:
+        destination = Destination.objects.get(destination_iata = place_destination)
+        category = Category.objects.get(category_name = place_category)
+        subcategory = Subcategory.objects.get(subcategory = place_subcategory)
+
+        # Update the place:
+        place.place_destination = destination
+        place.place_category = category
+        place.place_subcategory = subcategory
+        place.place_infos = place_infos
+
+        # Save the update:
+        place.save()
+
+        return JsonResponse({"success": "Place listing updated"}, status=200)
 
 @login_required
 @csrf_exempt
@@ -152,7 +204,6 @@ def save_destination_image(request, dest_id):
         return JsonResponse({"error": "POST request required."}, status=400)
 
 @csrf_exempt
-@login_required
 def show_destinations(request):
     if request.method == "POST":
         return JsonResponse({"error": "GET request required."}, status=400)
@@ -163,29 +214,41 @@ def show_destinations(request):
         return JsonResponse({"destinations": destinations}, status=200)
 
 @csrf_exempt
-@login_required
 def show_destination(request, destination_id):
     if request.method == "POST":
         return JsonResponse({"error": "GET request required."}, status=400)
     else:
-        # Get and return the destination:
-        destination = Destination.objects.get(pk = int(destination_id))
-        destination = destination.serialize()
-        print(f"destination: {destination}")
+        if request.user.is_authenticated:
+            # Get and return the destination:
+            destination = Destination.objects.get(pk = int(destination_id))
+            destination = destination.serialize()
 
-        # Get the categories and subcategories:
-        categories = Category.objects.all()
-        categories = [category.serialize() for category in categories]
+            # Get the categories and subcategories:
+            categories = Category.objects.all()
+            categories = [category.serialize() for category in categories]
 
-        # Get the places of the selected destination:
-        places = Place.objects.filter(place_destination__id = destination_id).order_by('place_category')
-        places = [place.serialize() for place in places]
+            # Get the places of the selected destination:
+            places = Place.objects.filter(place_destination__id = destination_id).order_by('place_category')
+            places_serialized = [place.serialize() for place in places]
 
-        return JsonResponse({
-            "destination": destination,
-            "places": places,
-            "categories": categories,
-            }, status=200)
+            # Make a place editable if the author is the logged in user:
+            editable = []
+            for place in places:
+                if place.place_author == request.user:
+                    editable.append(True)
+                else:
+                    editable.append(False)
+            print(editable)
+
+            return JsonResponse({
+                "destination": destination,
+                "places": places_serialized,
+                "categories": categories,
+                "editable": editable
+                }, status=200)
+        else:
+            print("not authenticated")
+            return JsonResponse({"error": "Please log in or register to see places"}, status=401)
 
 @csrf_exempt
 @login_required
@@ -254,6 +317,23 @@ def add_place(request):
             new_place.save()
 
             return JsonResponse({"message": "Successully submitted place. Thanks."}, status=201)
+
+@csrf_exempt
+@login_required
+def my_places(request):
+    if request.method == 'GET':
+        user = request.user
+        my_places = Place.objects.filter(place_author = user).order_by('place_destination__destination_name')
+        my_places = [place.serialize() for place in my_places]
+
+        my_destinations = []
+        for place in my_places:
+            if not place["place_destination"] in my_destinations:
+                my_destinations.append(place["place_destination"])
+
+        return JsonResponse({"my_places": my_places, "my_destinations": my_destinations}, status = 200)
+    else:
+        return JsonResponse({"error": "GET request required."}, status=400)
 
 def load_subcategories(request, category_id):
     if request.method == "GET":

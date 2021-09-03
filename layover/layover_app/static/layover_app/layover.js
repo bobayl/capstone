@@ -1,23 +1,40 @@
 // Load the DOM and attach the event listeners to the menu items:
 document.addEventListener('DOMContentLoaded', function() {
+  document.querySelector('#start_page').style.display = "none";
   document.querySelector('#destinations').style.display = "none";
-  document.querySelector('#places').style.display = "none";
-  document.querySelector('#place_details').style.display = "none";
-  document.querySelector('#add_new').style.display = "none";
+  if (document.querySelector('#places')) {
+    document.querySelector('#places').style.display = "none";
+  }
+  if (document.querySelector('#place_details')) {
+    document.querySelector('#place_details').style.display = "none";
+  }
+  if (document.querySelector('#add_new')) {
+    document.querySelector('#add_new').style.display = "none";
+  }
+  if (document.querySelector('#my_places')) {
+    document.querySelector('#my_places').style.display = "none";
+  }
 
   // Start with showing all destinations:
   show_destinations();
 
   // Toggle with Nav-Bar-Links:
-  document.querySelector('#add_new_menue').addEventListener('click', () => {
-    add_place();
-  });
+  if (document.querySelector('#add_new')) {
+    document.querySelector('#add_new_menue').addEventListener('click', () => {
+      add_place();
+    });
+  }
   document.querySelector('#show_start_page').addEventListener('click', () => {
     show_start_page();
   });
   document.querySelector('#destinations_view').addEventListener('click', () => {
     show_destinations();
   });
+  if (document.querySelector('#my_places')) {
+    document.querySelector('#show_my_places').addEventListener('click', () => {
+      my_places();
+    });
+  }
 });
 
 function show_start_page() {
@@ -35,9 +52,18 @@ function show_destinations() {
   // Display the destinations div:
   document.querySelector('#destinations').style.display = "block";
   document.querySelector('#start_page').style.display = "none";
-  document.querySelector('#places').style.display = "none";
-  document.querySelector('#place_details').style.display = "none";
-  document.querySelector('#add_new').style.display = "none";
+  if (document.querySelector('#places')) {
+    document.querySelector('#places').style.display = "none";
+  }
+  if (document.querySelector('#place_details')) {
+    document.querySelector('#place_details').style.display = "none";
+  }
+  if (document.querySelector('#add_new')) {
+    document.querySelector('#add_new').style.display = "none";
+  }
+  if (document.querySelector('#my_places')) {
+    document.querySelector('#my_places').style.display = "none";
+  }
 
   // Fetch all the stored destinations from the server:
   fetch('show_destinations', {
@@ -45,7 +71,6 @@ function show_destinations() {
   })
   .then(response => response.json())
   .then(data => {
-    console.log(data);
     // Clear the select options:
     document.querySelector('#destination_selector').innerHTML="";
 
@@ -294,25 +319,39 @@ function update_destination_selector(){
 //************************************
 function show_destination(destination_id) {
   document.querySelector('#destinations').style.display = "none";
-  document.querySelector('#places').style.display = "block";
+  if (document.querySelector('#places')) {
+    document.querySelector('#places').style.display = "block";
+  }
 
   // fetch all the places for the selected destination:
   let route = `show_destination/${destination_id}`;
   fetch(route, {
     method: 'GET'
   })
-  .then(response => response.json())
+  .then(response => {
+    if (response.status === 401) {
+      window.location.replace("login_view");
+    }
+    return response.json();
+  })
   .then(data => {
-    console.log(data);
-    let destination = data["destination"];
-    let places = data["places"];
-    let categories = data["categories"];
+    if (data["error"]) {
+    } else {
+      let destination = data["destination"];
+      let places = data["places"];
+      let categories = data["categories"];
+      let editable = data["editable"];
 
-    // Fill destination title:
-    document.querySelector("#destination_title").innerHTML = destination["destination_name"];
+      for (let i=0; i<places.length; i++) {
+        places[i].is_editable = editable[i];
+      }
 
-    // List all places:
-    list_places(places, categories);
+      // Fill destination title:
+      document.querySelector("#destination_title").innerHTML = destination["destination_name"];
+
+      // List all places:
+      list_places(places, categories);
+    }
   });
 }
 function list_places(places, categories) {
@@ -384,13 +423,13 @@ function list_places(places, categories) {
 // Load place function:
 //************************************
 function load_place(place_id){
-  console.log("loading place...");
 
   // Display the place details block:
   document.querySelector('#start_page').style.display = "none";
   document.querySelector('#destinations').style.display = "none";
   document.querySelector('#add_new').style.display = "none";
   document.querySelector('#places').style.display = "none";
+  document.querySelector('#my_places').style.display = "none";
   document.querySelector('#place_details').style.display = "block";
 
   // Fetch the place details:
@@ -398,14 +437,21 @@ function load_place(place_id){
   .then(response => response.json())
   .then(data => {
     let place = data.place;
-    //console.log(place);
+    let is_editable = data.is_editable;
     // Update the title:
     document.querySelector('#place_title').innerHTML = place.place_name;
     // Update the place author:
     document.querySelector('#place_author').innerHTML = `Place selected by ${place.place_author}`;
     // Setting the background image:
     document.querySelector('#place_header').style.backgroundImage = `url(${place.place_image_url})`;
-    console.log(place.place_image_url);
+    // If author is the visitor, activate the edit button:
+    if (is_editable) {
+      let edit_button = document.querySelector('#edit_place_button');
+      edit_button.style.display = "block";
+      edit_button.onclick = function() {
+        edit_place(place);
+      }
+    }
 
 
     // Update place info:
@@ -459,9 +505,6 @@ function load_place(place_id){
 //************************************
 function add_place() {
   document.querySelector('#add_new').style.display = "block";
-  //document.querySelector("#search_frame").style.display = "block";
-  //document.querySelector('#pac-input').style.display = "block";
-  //document.querySelector("#map").style.display = "block";
   document.querySelector('#pac-input').value = "";
   document.querySelector('#place_details').style.display = "none";
   document.querySelector('#places').style.display = "none";
@@ -686,4 +729,208 @@ function submit_place(place) {
       document.querySelector('#place_images_for_selection_container').style.display = "none";
     });
   }
+}
+
+//************************************
+// Function to list my places sorted by destination:
+//************************************
+function my_places() {
+  // Display the destinations div:
+  document.querySelector('#destinations').style.display = "none";
+  document.querySelector('#start_page').style.display = "none";
+  document.querySelector('#places').style.display = "none";
+  document.querySelector('#place_details').style.display = "none";
+  document.querySelector('#add_new').style.display = "none";
+  document.querySelector('#my_places').style.display = "block";
+
+  // Fetch the users places from the server:
+  fetch('my_places')
+  .then(response => response.json())
+  .then(data => {
+    let my_destinations = data.my_destinations;
+    let my_places = data.my_places;
+    // Loop over the categories:
+    for (destination of my_destinations) {
+      // Create a category container:
+      let dest_container = document.createElement('div');
+      // Create category title:
+      let dest_title = document.createElement('h2');
+      dest_title.className = "fw-light";
+      dest_title.innerHTML = destination;
+      dest_container.appendChild(dest_title);
+      // Create the card group for the category:
+      let card_group = document.createElement('div');
+      card_group.className = "card-group";
+
+      // Loop over the places:
+      for (place of my_places) {
+        if (place.place_destination === destination) {
+          // Create the card for each place:
+          let place_card = document.createElement('div');
+          place_card.className = "card shadow-sm";
+          place_image = document.createElement('img');
+          place_image.src = `${place.place_image_url}`;
+          place_image.className = "card-img-top";
+          place_image.alt = "...";
+          place_card.appendChild(place_image);
+          let place_body = document.createElement('div');
+          place_body.className = "card-body";
+          let place_title = document.createElement('h5');
+          place_title.className = "card-title";
+          place_title.innerHTML = place.place_name;
+          place_body.appendChild(place_title);
+          let place_subtitle = document.createElement('h6');
+          place_subtitle.innerHTML = place.place_subcategory;
+          place_body.appendChild(place_subtitle);
+          place_card.appendChild(place_body);
+          let place_footer = document.createElement('div');
+          place_footer.className = "card-footer";
+          let footer_text = document.createElement('small');
+          footer_text.className = "text-muted";
+          footer_text.innerHTML = "added on " + place.place_date_added + " by " + place.place_author;
+          place_footer.appendChild(footer_text);
+          place_card.appendChild(place_footer);
+          // Add click event to the place_card:
+          place_card.onmouseover = function(){
+            this.style = "opacity: 50%";
+          }
+          place_card.onmouseout = function(){
+            this.style = "opacity: 100%";
+          }
+          place_card.id = place.id;
+          place_card.name = place.place_name;
+
+          place_card.addEventListener('click', () => {
+            // Load the place:
+            load_place(place_card.id);
+          })
+          card_group.appendChild(place_card);
+        }
+      }
+      dest_container.appendChild(card_group);
+      document.querySelector('#my_places_list').appendChild(dest_container);
+    }
+  })
+}
+
+//************************************
+// Edit Place function:
+//************************************
+function edit_place(place) {
+  console.log(place);
+  // Pop up the modal to edit the place:
+  const edit_modal = new bootstrap.Modal(document.getElementById('edit_place_modal'), backdrop=true);
+  // Set the modal title:
+  document.querySelector('#edit_place_modal_title').innerHTML = place.place_name + " - " + place.place_destination;
+  // Prepopulate the form with the existing values:
+  update_destinations_and_categories(place);
+  document.querySelector("#edit_placeinfos").value = place.place_infos;
+
+  // Show the modal:
+  edit_modal.show();
+
+  // Send the edits to the server:
+  document.querySelector('#save_edit_button').onclick = function() {
+    send_edit(place.id);
+    edit_modal.hide();
+  }
+}
+
+function update_destinations_and_categories(place) {
+  fetch('update_destinations_and_categories')
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+    // Extract the data:
+    let destinations = data.destinations;
+    let categories = data.categories;
+
+    // Update destination selector:
+    let dest_selector = document.querySelector('#edit_destination');
+    dest_selector.innerHTML = "";
+    for (destination of destinations) {
+      let option = document.createElement('option');
+      option.value = destination.destination_iata;
+      option.innerHTML = destination.destination_name + " - " + destination.destination_iata;
+      if (place.place_destination == destination.destination_name) {
+        option.selected = "selected";
+      }
+      dest_selector.appendChild(option);
+    }
+    dest_selector.options.selected = "selected";
+
+    // Update category selector:
+    let cat_selector = document.querySelector('#edit_category');
+    let sub_cat_selector = document.querySelector('#edit_subcategory');
+    cat_selector.innerHTML = "";
+    sub_cat_selector.innerHTML = "";
+    for (category of categories) {
+      let option = document.createElement('option');
+      option.value = category.category_name;
+      option.innerHTML = category.category_name;
+      if (place.place_category == category.category_name) {
+        option.selected = "selected";
+        // Set the subcategory menu:
+        for (subcategory of category.subcategories) {
+          let option = document.createElement('option');
+          option.value = subcategory;
+          option.innerHTML = subcategory;
+          if (place.place_subcategory == subcategory) {
+            option.selected = "selected";
+          }
+          sub_cat_selector.appendChild(option);
+        }
+        sub_cat_selector.options.selected = "selected";
+      }
+      cat_selector.appendChild(option);
+    }
+    cat_selector.options.selected = "selected";
+
+    cat_selector.onchange = function() {
+      let selected_category = cat_selector.value;
+      sub_cat_selector.innerHTML = "";
+      for (category of categories) {
+        if (selected_category == category.category_name) {
+          // Set the subcategory menu:
+          for (subcategory of category.subcategories) {
+            let option = document.createElement('option');
+            option.value = subcategory;
+            option.innerHTML = subcategory;
+            if (place.place_subcategory == subcategory) {
+              option.selected = "selected";
+            }
+            sub_cat_selector.appendChild(option);
+          }
+          sub_cat_selector.options.selected = "selected";
+        }
+      }
+    }
+  })
+}
+function send_edit(place_id) {
+  let destination_update = document.querySelector('#edit_destination').value;
+  let category_update = document.querySelector('#edit_category').value;
+  let subcategory_update = document.querySelector('#edit_subcategory').value;
+  let infos_update = document.querySelector('#edit_placeinfos').value;
+
+  let updated_place = {};
+  updated_place.dest_update = destination_update;
+  updated_place.cat_update = category_update;
+  updated_place.subcat_update = subcategory_update;
+  updated_place.infos_update = infos_update;
+
+  console.log("sending edit...");
+  console.log(updated_place);
+  let route = `update_place/${place_id}`;
+  fetch(route, {
+    method: 'POST',
+    body: JSON.stringify({
+      updated_place: updated_place
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+  })
+
 }

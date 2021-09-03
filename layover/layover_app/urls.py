@@ -20,7 +20,10 @@ urlpatterns = [
     path("add_destination", views.add_destination, name="add_destination"),
     path("add_subcategory", views.add_subcategory, name="add_subcategory"),
     path("load_place/<str:place_id>", views.load_place, name="load_place"),
-    path("save_destination_image/<int:dest_id>", views.save_destination_image, name="save_destination_image")
+    path("save_destination_image/<int:dest_id>", views.save_destination_image, name="save_destination_image"),
+    path("my_places", views.my_places, name="my_places"),
+    path("update_destinations_and_categories", views.update_destinations_and_categories, name="update_destinations_and_categories"),
+    path("update_place/<int:place_id>", views.update_place, name="update_place")
 ]
 
 if settings.DEBUG:
