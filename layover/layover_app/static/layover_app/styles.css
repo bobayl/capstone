@@ -1,10 +1,15 @@
+body {
+  background-color: white;
+}
+
 h1 {
   text-align: center;
   margin-top: 30px;
+  color: black;
 }
 
 h2 {
-  margin-top: 20px;
+  margin-top: 0px;
   text-align: center;
   color: grey;
   padding-top: 100 px;
@@ -43,42 +48,79 @@ small {
 
 /* Always set the map height explicitly to define the size of the div
  * element that contains the map. */
+
+#place_info {
+  color: black;
+  font-size: 14px;
+}
+
 #add_new {
   background-color: white;
   padding: 0px;
 }
 
-#place_form {
+
+#place_form, #reset_pwd_form {
   background-color: white;
   width: 80%;
   max-width: 800px;
   margin: auto;
 }
+
+
 #place_infos_textarea {
   height: 200px;
 }
 
- #map {
+#map {
+min-height: 500px;
+width: 90%;
+max-width: 1000px;
+margin: auto;
+margin-top: 20px;
+background-color: lightblue;
+}
+
+#places_map {
   min-height: 500px;
   width: 90%;
   max-width: 1000px;
   margin: auto;
   margin-top: 20px;
-  }
+  background-color: lightblue;
+}
 
 #infowindow-content {
   display: none;
   }
+#places-infowindow-container > div {
+  display: none;
+}
 
 #infowindow-content {
   display: inline;
-
   }
 
-#search_frame {
+#places_map #places-infowindow-content {
+  display: inline;
+}
+
+#category_title_container {
+  padding: 10px;
+  border-style: solid;
+  border-color: lightgrey;
+  border-width: thin;
+  border-radius: 3px;
   background-color: white;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 20px;
+}
+
+#search_frame, #search_frame1 {
+  background-color: white;
+  padding-top: 0px;
+  padding-bottom: 0px;
   max-width: 1000px;
   width: 90%;
   margin: auto;
@@ -95,7 +137,7 @@ small {
   margin-top: 0px;
 }
 
-#login_form, #registration_form, #destination_select_container {
+#login_form, #registration_form, #destination_select_container, #reset_pwd_form, #update_pwd_form {
   background-color: white;
   padding: 10px;
   padding-right: 10px;
@@ -103,6 +145,10 @@ small {
   margin: auto;
   margin-top: 20px;
   margin-bottom: 0px;
+}
+
+.reset-text, .reset-form {
+  text-align: center;
 }
 
 #destinations_header {
@@ -148,6 +194,7 @@ small {
   width: 200px;
   overflow: hidden;
   margin: 5px;
+  padding: 5px!important;
 }
 #place_details_images > div > img {
   width: 100%;
@@ -196,25 +243,41 @@ small {
   opacity: 0.5;
 }
 
+#place_data {
+  margin-top: 20px;
+  margin-left: 60px!important;
+  margin-right: 60px!important;
+}
 #place_header {
+  margin-bottom: 20px;
   height: 600px;
-  width: 80%;
+  width: 100%;
 }
 #place_info_list {
-  width: 80%;
-  margin: auto;
+  margin-top: 20px;
+  margin-left: 60px;
+  margin-right: 60px;
 }
 #place_title_container {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.8);
+}
+#comments {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+#comment{
+  margin-left: 60px;
+  margin-right: 60px;
+  max-width: 800px;
+}
+#empty_comments {
+  text-align: center;
 }
 
 #image_error {
   margin-top: 10px!important;
 }
 
-#edit_place_button {
-  margin: auto;
-}
 
 .centered {
   position: absolute;
@@ -228,16 +291,16 @@ small {
 }
 
 .card {
-  padding: 0px;
-  margin: 5px;
+  padding: 5px;
+  margin: 10px;
   max-width: 200px;
   min-width: 200px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
+
 }
-.card-group {
-  margin: auto;
+#card-group {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
 }
 
 .card-img-top {
@@ -248,7 +311,11 @@ small {
   font-size: 16px;
 }
 .text-muted {
-  font-size: 10px;
+  font-size: 12px;
+  color: black;
+}
+.lead {
+  color: black;
 }
 .card-footer {
   width: 100%;
@@ -264,7 +331,7 @@ small {
   margin-top: 5px;
 }
 .form-label {
-  font-size: small;
+  
 }
 
 .form-block {
@@ -288,4 +355,8 @@ small {
 .py-5 {
   padding-top: 0px!important;
   padding-bottom: 0px!important;
+}
+
+.nav-link, .navbar-brand {
+  cursor: pointer;
 }

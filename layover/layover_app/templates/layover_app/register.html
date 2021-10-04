@@ -4,7 +4,7 @@
 {% block body %}
 
   <div class="form-block">
-    <h2>Please register to share your favorite places</h2>
+    <h1 class="fw-light">Please register to share your places</h1>
 
     {% if message %}
     <div class="alert alert-warning" role="alert">
@@ -18,7 +18,7 @@
             <input class="form-control" autofocus type="text" name="username" placeholder="Username">
         </div>
         <div class="form-group">
-            <input id="edw_email" class="form-control" type="email" name="email" placeholder="Edelweiss Email Address">
+            <input id="edw_email" class="form-control" type="email" name="email" placeholder="Email Address">
         </div>
         <div class="form-group">
             <input class="form-control" type="password" name="password" placeholder="Password">
@@ -43,11 +43,13 @@
       let email_field = document.querySelector("#edw_email");
       let email = email_field.value;
       let email_end = email.slice(-17);
+      /*
       if (email_end != "@flyedelweiss.com") {
         email_field.style = "border-color: red; color: red";
       } else {
         email_field.style = "border-color: lightgrey; color: black";
       }
+      */
     });
   });
 

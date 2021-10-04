@@ -3,7 +3,7 @@
 
 {% block body %}
   <div class="form-block">
-    <h2>Please log in to explore the world</h2>
+    <h1 class="fw-light">Please log in</h1>
       {% if message %}
           <div>{{ message }}</div>
       {% endif %}
@@ -20,6 +20,9 @@
       </form>
       <div class="login_register">
         Don't have an account? <a href="{% url 'layover_app:register' %}">Register here.</a>
+      </div>
+      <div class="login_register">
+        Forgot your credentials? <a href="{% url 'reset_password' %}">Reset your password here.</a>
       </div>
   </div>
 

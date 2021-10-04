@@ -26,7 +26,8 @@
     {% if user.is_authenticated %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <a id="show_start_page" class="navbar-brand" href="#"><span>&#127757;</span> Layover Info</a>
+        <!--<img src="{% static "/images/logo/logo_small.png" %}" alt="pink turtle club" id="show_start_page" > -->
+        <a id="show_start_page" class="navbar-brand"><span>&#128034;</span> Layover Info</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -36,12 +37,18 @@
               <a class="nav-link" href="{% url 'layover_app:index' %}" id="destinations_view">Destinations</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="#" id="add_new_menue">Add New Place</a>
+              <a class="nav-link" aria-current="page" id="add_new_menue">Add New Place</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="#" id="show_my_places">My Places</a>
+              <a class="nav-link" aria-current="page" id="show_my_places">My Places</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" id="news_page">Newest</a>
             </li>
           </ul>
+          <span class="navbar-text">
+            <a id="my_name" class="nav-link"  href="#">{{ user.username }}</a>
+          </span>
           <span class="navbar-text">
             <a id="logout" class="nav-link"  href="{% url 'layover_app:logout_view' %}">Logout</a>
           </span>
@@ -53,7 +60,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <a id="show_start_page" class="navbar-brand" href="#"><span>&#127757;</span> Layover Info</a>
+        <a id="show_start_page" class="navbar-brand" href="#"><span>&#128034;</span> Layover Info</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -61,6 +68,9 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
               <a class="nav-link" href="{% url 'layover_app:index' %}" id="destinations_view">Destinations</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" id="news_page">Newest</a>
             </li>
           </ul>
           <span class="navbar-text">
@@ -83,8 +93,6 @@
         <p class="float-end mb-1">
           <a href="#">Back to top</a>
         </p>
-        <p class="mb-1">Album example is &copy; Bootstrap, but please download and customize it for yourself!</p>
-        <p class="mb-0">New to Bootstrap? <a href="/">Visit the homepage</a> or read our <a href="../getting-started/introduction/">getting started guide</a>.</p>
       </div>
     </footer>
 

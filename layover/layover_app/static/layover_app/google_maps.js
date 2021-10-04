@@ -14,7 +14,7 @@
 // This example requires the Places library. Include the libraries=places
 // parameter when you first load the API. For example:
 // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
-const api_key = "api_key";
+//const api_key = "my_api_key";
 
 // Declare an empty object for the place:
 const new_place = {};
@@ -22,11 +22,14 @@ const new_place = {};
 var title_image_url = "";
 
 function initMap() {
-  //console.log("initMap() called");
+  // Create the map:
   const map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 47.00, lng: 8.25 },
     zoom: 10,
+    mapId: "58fbe1d4b7afdb78"
   });
+
+
   const card = document.getElementById("pac-card");
   const input = document.getElementById("pac-input");
   const biasInputElement = document.getElementById("use-location-bias");
@@ -68,7 +71,8 @@ function initMap() {
     infowindow.close();
     marker.setVisible(false);
     const place = autocomplete.getPlace();
-    console.log(place);
+    console.log(place.geometry.location.toJSON());
+
 
     /////
     // Get photo references:
@@ -137,11 +141,12 @@ function initMap() {
     }
 
     // If the place has a geometry, then present it on a map.
+
     if (place.geometry.viewport) {
       map.fitBounds(place.geometry.viewport);
     } else {
       map.setCenter(place.geometry.location);
-      map.setZoom(17);
+      map.setZoom(13);
     }
     marker.setPosition(place.geometry.location);
     marker.setVisible(true);
@@ -169,4 +174,10 @@ function fill_place(place) {
   new_place.place_phone = place.international_phone_number;
   new_place.place_googlemaps = place.url;
   new_place.place_status = place.business_status;
+
+  let coordinates = place.geometry.location.toJSON();
+  new_place.place_lat = coordinates.lat;
+  new_place.place_lng = coordinates.lng;
+
+  console.log(new_place);
 }

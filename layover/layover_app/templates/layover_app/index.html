@@ -6,225 +6,357 @@
 {% if user.is_authenticated %}
 
 <!-- Destinations -->
-  <div id="destinations">
-    <section class="py-5 text-center container" id="destinations_header">
-      <div class="row py-lg-5" id="destinations_subheader">
-        <div class="col-lg-6 col-md-8 mx-auto">
-          <h1 class="fw-light">The Destinations</h1>
-          <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
-          <p>
-            <a href="#" class="btn btn-primary my-2" onclick="save_new_destination()">Create New Destination</a>
-            <a href="#" class="btn btn-secondary my-2">Pick Destination on Map</a>
-            <div id="destination_select_container" class="">
-              <select id="destination_selector" class="form-select" aria-label="Default select example">
-                <option selected>Select Destination</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-              </select>
-            </div>
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <div class="album py-5 bg-light">
-      <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="destinations_container">
-        </div>
+<div id="destinations">
+  <section class="py-5 text-center container" id="destinations_header">
+    <div class="row py-lg-5" id="destinations_subheader">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">The Destinations</h1>
+        <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+        <p>
+          <a href="#" class="btn btn-primary my-2" onclick="save_new_destination()">Create New Destination</a>
+          <!--<a href="#" class="btn btn-secondary my-2">Pick Destination on Map</a>-->
+          <div id="destination_select_container" class="">
+            <select id="destination_selector" class="form-select" aria-label="Default select example">
+              <option selected>Select Destination</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
+          </div>
+        </p>
       </div>
     </div>
-  </div>
+  </section>
 
-<!-- Places -->
   <div class="album py-5 bg-light">
     <div class="container">
-      <div id="places">
-        <h1 class="fw-light" id="destination_title"></h1>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="destinations_container">
       </div>
     </div>
   </div>
+</div>
+
+<!-- Destination -->
+<div id="places">
+  <section class="py-5 text-center container" id="destinations_header">
+    <div class="row py-lg-5" id="destinations_subheader">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light" id="destination_title">The Destinations</h1>
+        <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+        <p>
+          <a href="#" class="btn btn-primary my-2" id="create_place_for_destination">Create New Place</a>
+          <a href="#" class="btn btn-secondary my-2" id="places_on_map_button">See Places on Map</a>
+          <div id="category_select_container" class="">
+            <select id="category_selector" class="form-select" aria-label="Default select example">
+              <option selected>Select Category</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
+          </div>
+        </p>
+      </div>
+    </div>
+  </section>
+  <div class="" id="places_container">
+  </div>
+  <div class="" id="places_map">
+  </div>
+  <div class="" id="places-infowindow-container">
+  </div>
+
+</div>
+
 
 <!-- Place Details -->
-  <div id="place_details">
-    <div class="py-5 text-center container" id="place_header">
-      <div class="row py-lg-5">
-        <div class="col-lg-6 col-md-8 mx-auto" id="place_title_container">
-          <h1 class="fw-light" id="place_title">Example Place</h1>
-          <h5 id="place_author"></h5>
-          <p class="lead text-muted" id="place_info">No place description by the author yet.</p>
-          <p>
-            <button type="button" class="btn btn-secondary btn-sm" id="edit_place_button" style="display: none">Edit Place</button>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="place_data">
-      <ul class="list-group" id="place_info_list">
-        <li class="list-group-item" id="place_name" style="font-weight: bold">name</li>
-        <li class="list-group-item"><span><i class="bi-pin-map"></i></span><span id="place_address"></span></li>
-        <li class="list-group-item">
-          <span><i class="bi-globe2"></i></span>
-          <span>
-            <a id="place_website" href="#" target="_blank"></a>
-          </span></li>
-        <li class="list-group-item"><span><i class="bi-telephone"></i></span><span id="place_phone"></span></li>
-        <li class="list-group-item" id="place_category">category</li>
-        <li class="list-group-item" id="place_subcategory">subcategory</li>
-        <li class="list-group-item">
-          <span><i class="bi-google"></i></span>
-          <span>
-            <a id="place_googlemaps" href="#" target="_blank">See on Google Maps</a>
-          </span>
-        </li>
-        <li class="list-group-item"><span><i class="bi-file-earmark-person"></i></span><span id="place_author2"></span></li>
-      </ul>
-    </div>
-
-    <div class="album py-5 bg-light">
-      <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="place_details_images">
-        </div>
+<div id="place_details">
+  <div class="py-5 text-center container" id="place_header">
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto" id="place_title_container">
+        <button type="button" class="btn btn-sm btn-outline-dark" id="back_to_destination_button">Dark</button>
+        <h1 class="fw-light" id="place_title">Example Place</h1>
+        <h5 id="place_author"></h5>
+        <p id="place_info">No place description by the author yet.</p>
+        <p>
+          <a href="#" class="btn btn-primary btn-sm my-2" id="comment_place_button">Comment</a>
+          <a href="#" class="btn btn-secondary btn-sm my-2" id="edit_place_button">Edit Place</a>
+        </p>
       </div>
     </div>
   </div>
+
+  <div class="place_data">
+    <ul class="list-group" id="place_info_list">
+      <li class="list-group-item" id="place_name" style="font-weight: bold">name</li>
+      <li class="list-group-item"><span><i class="bi-pin-map"></i></span><span id="place_address"></span></li>
+      <li class="list-group-item">
+        <span><i class="bi-globe2"></i></span>
+        <span>
+          <a id="place_website" href="#" target="_blank"></a>
+        </span></li>
+      <li class="list-group-item"><span><i class="bi-telephone"></i></span><span id="place_phone"></span></li>
+      <li class="list-group-item" id="place_category">category</li>
+      <li class="list-group-item" id="place_subcategory">subcategory</li>
+      <li class="list-group-item">
+        <span><i class="bi-google"></i></span>
+        <span>
+          <a id="place_googlemaps" href="#" target="_blank">See on Google Maps</a>
+        </span>
+      </li>
+      <li class="list-group-item"><span><i class="bi-file-earmark-person"></i></span><span id="place_author2"></span></li>
+    </ul>
+  </div>
+
+  <div class="album py-5 bg-light" style="margin-top: 40px;">
+    <h2 class="fw-light" style="text-align: left; margin-left: 60px;">Gallery</h2>
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="place_details_images">
+      </div>
+    </div>
+  </div>
+
+  <div class="" id="comments-container" style="margin-top: 40px;">
+    <h2 class="fw-light" style="text-align: left; margin-left: 60px;">Comments</h2>
+    <div class="" id="comments">
+    </div>
+  </div>
+
+</div>
 
 <!-- Add new place -->
-  <div id="add_new">
+<div id="add_new">
 
-    <section class="py-5 text-center container" id="destinations_header">
-      <div class="row py-lg-5" id="destinations_subheader">
-        <div class="col-lg-6 col-md-8 mx-auto">
-          <h1 class="fw-light">Add new Place</h1>
-          <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
-        </div>
+  <section class="py-5 text-center container" id="destinations_header">
+    <div class="row py-lg-5" id="destinations_subheader">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">Add new Place</h1>
+        <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+        <p>
+          <a href="#" class="btn btn-primary my-2" id="add_place_manually">Add a Place Manually</a>
+        </p>
       </div>
-    </section>
-
-    <div id="search_frame" class="input-group mb-3">
-      <input id="pac-input" type="input" class="form-control" placeholder="Search Location" aria-label="Recipient's username" aria-describedby="button-addon2">
+    </div>
+  </section>
+  <div id="search_frame">
+    <div class="input-group mb-3">
+      <input id="pac-input" type="input" class="form-control" placeholder="Search Location" aria-label="Recipient's username" aria-describedby="place_add_button1">
       <button class="btn btn-outline-secondary" type="button" id="place_add_button1" disabled >Add Place</button>
     </div>
-    <!-- Alerts -->
+  </div>
 
-    <div id="place_add_success" class="alert alert-success" role="alert">
-      Place successfully added. Thanks for contribution!
-    </div>
-    <div id="place_exists" class="alert alert-warning" role="alert">
-      Place already exists in our database.
-    </div>
-    <!-- Images for selection -->
 
-    <div class="album py-5 bg-light" id="place_images_for_selection_container">
-      <h5 class="fw-light">Please select your favorite image below to be used as the title image.</h5>
-      <div class="alert alert-warning" role="alert" id="place_image_error">
-        Image saving problem: Please select a different one.
+
+  <!-- Alerts -->
+  <div id="place_add_success" class="alert alert-success" role="alert">
+    Place successfully added. Thanks for contribution!
+  </div>
+  <div id="place_exists" class="alert alert-warning" role="alert">
+    Place already exists in our database.
+  </div>
+
+  <!-- Images for selection -->
+  <div class="album py-5 bg-light" id="place_images_for_selection_container">
+    <h5 class="fw-light">Please select your favorite image below to be used as the title image.</h5>
+    <div class="alert alert-warning" role="alert" id="place_image_error">
+      Image saving problem: Please select a different one.
+    </div>
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="place_images_for_selection">
       </div>
-      <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="place_images_for_selection">
+    </div>
+    <h5 class="fw-light" id="selected_image"></h5>
+  </div>
+
+  <div id="place_form">
+    <form class="" id="new_place_form">
+      {% load crispy_forms_tags %}
+      {{ place_form.as_p }}
+    </form>
+    <div class="">
+      <div class="mb-3">
+        <label for="formFile" class="form-label">Choose a title image from your photos (optional):</label>
+        <input class="form-control" type="file" id="formFile">
+      </div>
+    </div>
+    <button class="btn btn-primary" type="button" id="place_add_button2" disabled >Add Place</button>
+  </div>
+
+  <div id="map">map div</div>
+  <div id="infowindow-content">
+    <span id="place-name" class="title"></span><br />
+    <span id="place-address"></span>
+  </div>
+
+
+  <!-- New Subcategory Modal -->
+  <div class="modal fade" id="subcategory_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add New Subcategory</h5>
         </div>
-      </div>
-      <h5 class="fw-light" id="selected_image"></h5>
-    </div>
-
-    <div id="place_form">
-      <form class="" id="new_place_form">
-        {{ place_form.as_p }}
-        <button class="btn btn-secondary" type="button" id="place_add_button2" disabled >Add Place</button>
-      </form>
-    </div>
-    <div id="map">map div</div>
-    <div id="infowindow-content">
-      <span id="place-name" class="title"></span><br />
-      <span id="place-address"></span>
-    </div>
-
-
-    <!-- New Subcategory Modal -->
-    <div class="modal fade" id="subcategory_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add New Subcategory</h5>
-          </div>
-          <div class="modal-body">
-            <div class="row g-3">
-              <div class="col">
-                <input id="modal_category" type="text" class="form-control" required="required" placeholder="Category" aria-label="" disabled>
-              </div>
-              <div class="col">
-                <input id="new_subcategory" type="text" class="form-control" required="required" placeholder="New Subcategory" aria-label="" maxlength="15">
-              </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col">
+              <input id="modal_category" type="text" class="form-control" required="required" placeholder="Category" aria-label="" disabled>
+            </div>
+            <div class="col">
+              <input id="new_subcategory" type="text" class="form-control" required="required" placeholder="New Subcategory" aria-label="" maxlength="15">
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" id="save_subcategory" class="btn btn-primary">Save Subcategory</button>
-          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" id="save_subcategory" class="btn btn-primary">Save Subcategory</button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 <!-- My Places -->
 <div class="" id="my_places">
   <div class="album py-5 bg-light">
     <div class="container">
+      <h1 class="fw-light" id="my_places_title">My Places</h1>
       <div id="my_places_list">
-        <h1 class="fw-light" id="my_places_title">My Places</h1>
+
       </div>
     </div>
   </div>
 </div>
 
 <!-- Start page -->
-  <div id="start_page" class="">
-    <h1 class="fw-light">Start Page: Welcome to Layover</h1>
-  </div>
+<div id="start_page" class="">
+  <h1 class="fw-light">Welcome to Layover Info</h1>
+  <p style="font-size: 300px; text-align: center;">&#127757</p>
+</div>
+
+<!-- Newest Conent -->
+<div class="" id="newest" style="display: none">
+  <main>
+    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+      <div class="col-md-5 p-lg-5 mx-auto my-5">
+        <h1 class="display-4 fw-normal">Punny headline</h1>
+        <p class="lead fw-normal">And an even wittier subheading to boot. Jumpstart your marketing efforts with this example based on Apple’s marketing pages.</p>
+        <a class="btn btn-outline-secondary" href="#">Coming soon</a>
+      </div>
+      <div class="product-device shadow-sm d-none d-md-block"></div>
+      <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+    </div>
+
+    <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+      <div class="bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
+        <div class="my-3 py-3">
+          <h2 class="display-5">Another headline</h2>
+          <p class="lead">And an even wittier subheading.</p>
+        </div>
+        <div class="bg-light shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
+      </div>
+      <div class="bg-light me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+          <h2 class="display-5">Another headline</h2>
+          <p class="lead">And an even wittier subheading.</p>
+        </div>
+        <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
+      </div>
+    </div>
+
+    <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+      <div class="bg-light me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+          <h2 class="display-5">Another headline</h2>
+          <p class="lead">And an even wittier subheading.</p>
+        </div>
+        <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
+      </div>
+      <div class="bg-primary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
+        <div class="my-3 py-3">
+          <h2 class="display-5">Another headline</h2>
+          <p class="lead">And an even wittier subheading.</p>
+        </div>
+        <div class="bg-light shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
+      </div>
+    </div>
+
+    <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+      <div class="bg-light me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+          <h2 class="display-5">Another headline</h2>
+          <p class="lead">And an even wittier subheading.</p>
+        </div>
+        <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
+      </div>
+      <div class="bg-light me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 py-3">
+          <h2 class="display-5">Another headline</h2>
+          <p class="lead">And an even wittier subheading.</p>
+        </div>
+        <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
+      </div>
+    </div>
+
+    <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+      <div class="bg-light me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+          <h2 class="display-5">Another headline</h2>
+          <p class="lead">And an even wittier subheading.</p>
+        </div>
+        <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
+      </div>
+      <div class="bg-light me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 py-3">
+          <h2 class="display-5">Another headline</h2>
+          <p class="lead">And an even wittier subheading.</p>
+        </div>
+        <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
+      </div>
+    </div>
+  </main>
+</div>
 
 <!-- New Destination Modal -->
-  <div class="modal fade" id="new_destination_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">New Destination</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="add_destination_form" class="" action="{% url 'layover_app:add_destination' %}" method="post">
-            <div class="row g-3">
-              <div class="col">
-                <input id="new_destination_name" name="new_destination_name" type="text" class="form-control" required="required" placeholder="Destination" aria-label="" maxlength="20">
-              </div>
-              <div class="col">
-                <input id="new_destination_iata" name="new_destination_iata" type="text" class="form-control" required="required" placeholder="IATA 3-letter Code" aria-label="" maxlength="3">
-              </div>
+<div class="modal fade" id="new_destination_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New Destination</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="add_destination_form" class="" action="{% url 'layover_app:add_destination' %}" method="post">
+          <div class="row g-3">
+            <div class="col">
+              <input id="new_destination_name" name="new_destination_name" type="text" class="form-control" required="required" placeholder="Destination" aria-label="" maxlength="20">
             </div>
-          </form>
-
-          <div class="" id="destination_images_modal_container">
-            <div class="alert alert-danger row g-3" id="destination_conflict" role="alert" style="display: none">
-              Sorry, this destination already exists in our collection.
-            </div>
-            <div class="alert alert-warning" role="alert" id="image_error">
-              There was a problem saving the selected image. Please select a different one.
-            </div>
-            <div class="spinner-border text-secondary centered" role="status" id="spinner">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            <div class="" id="destination_images_modal">
+            <div class="col">
+              <input id="new_destination_iata" name="new_destination_iata" type="text" class="form-control" required="required" placeholder="IATA 3-letter Code" aria-label="" maxlength="3">
             </div>
           </div>
+        </form>
 
+        <div class="" id="destination_images_modal_container">
+          <div class="alert alert-danger row g-3" id="destination_conflict" role="alert" style="display: none">
+            Sorry, this destination already exists in our collection.
+          </div>
+          <div class="alert alert-warning" role="alert" id="image_error">
+            There was a problem saving the selected image. Please select a different one.
+          </div>
+          <div class="spinner-border text-secondary centered" role="status" id="spinner">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <div class="" id="destination_images_modal">
+          </div>
         </div>
-        <div class="modal-footer">
-          <button id="cancel_new_destination" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button id="save_destination" type="button" class="btn btn-primary" >Next</button>
-        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button id="cancel_new_destination" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button id="save_destination" type="button" class="btn btn-primary" >Next</button>
       </div>
     </div>
   </div>
+</div>
 
 <!-- Edit Place Modal -->
 <div class="modal fade" id="edit_place_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -259,10 +391,81 @@
           <label for="exampleFormControlTextarea1" class="form-label">Your Place Infos</label>
           <textarea class="form-control" id="edit_placeinfos" rows="3"></textarea>
         </div>
-        <button type="button" class="btn btn-outline-danger">Delete Place</button>
+        <button type="button" class="btn btn-outline-danger" id="delete_place_button">Delete Place</button>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="save_edit_button">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Place Modal -->
+<div class="modal fade" id="delete_place_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="delete_modal_title"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="delete_modal_text">
+        Are you sure?
+      </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="save_edit_button">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel_delete_button">Close</button>
+        <button type="button" class="btn btn-danger" id="confirm_delete_button">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Comment Place Modal -->
+<div class="modal fade" id="comment_place_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="comment_modal_title"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="exampleFormControlTextarea1" class="form-label">Your Comment</label>
+          <textarea class="form-control" id="comment_text" rows="3"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="save_comment_button">Save Comment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gallery Modal -->
+<div class="modal fade" id="gallery_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+          <!-- Images -->
+          <div class="carousel-inner" id="gallery_inner">
+
+          </div>
+          <!-- Previous and Next buttons -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -270,9 +473,10 @@
 
 {% else %}
 
-  <div id="start_page" class="">
-    <h1>Start Page: Not logged in</h1>
-  </div>
+<div id="start_page" class="">
+  <h1 class="fw-light">Welcome to Layover Info</h1>
+  <p style="font-size: 300px; text-align: center;">&#127757</p>
+</div>
 
   <!-- Destinations -->
     <div id="destinations">
@@ -304,6 +508,33 @@
         </div>
       </div>
     </div>
+
+  <!-- Destination -->
+    <div id="places">
+      <section class="py-5 text-center container" id="destinations_header">
+        <div class="row py-lg-5" id="destinations_subheader">
+          <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light" id="destination_title">The Destinations</h1>
+            <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+            <p>
+              <a href="#" class="btn btn-primary my-2" id="create_place_for_destination">Create New Place</a>
+              <a href="#" class="btn btn-secondary my-2">See Places on Map</a>
+              <div id="category_select_container" class="">
+                <select id="category_selector" class="form-select" aria-label="Default select example">
+                  <option selected>Select Category</option>
+                  <option value="1">One</option>
+                  <option value="2">Two</option>
+                  <option value="3">Three</option>
+                </select>
+              </div>
+            </p>
+          </div>
+        </div>
+      </section>
+      <div class="" id="places_container">
+
+      </div>
+    </div>
 {% endif %}
 
 
@@ -317,4 +548,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
   <script type="text/javascript" src="{% static 'layover_app/layover.js' %}"></script>
   <script type="text/javascript" src="{% static 'layover_app/google_maps.js' %}"></script>
+
+
+
 {% endblock %}
