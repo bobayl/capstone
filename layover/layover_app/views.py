@@ -16,7 +16,7 @@ from apiclient.discovery import build
 from .models import User, Destination, Place, Category, Subcategory, Comment
 
 # GOOGLE API-Key:
-api_key = 'my_api_key'
+api_key = 'YOUR_API_KEY'
 # Google Custom Search Engine ID:
 cx = '949f3af724dcd2f56'
 
@@ -24,6 +24,7 @@ cx = '949f3af724dcd2f56'
 
 def index(request):
     return render(request, 'layover_app/index.html', {
+        "api_key": api_key,
         "place_form": PlaceForm()
     })
 
@@ -121,7 +122,7 @@ def add_destination(request):
         new_destination_name = destination.get("destination_name")
         new_destination_iata = destination.get("destination_iata")
         # Put the destination into the right format:
-        new_destination_name = new_destination_name.capitalize()
+        new_destination_name = new_destination_name.upper()
         new_destination_iata = new_destination_iata.upper()
         print(new_destination_name)
         print(new_destination_iata)
@@ -140,10 +141,20 @@ def add_destination(request):
 
             # Get destination images from Google:
             resource = build("customsearch", 'v1', developerKey=api_key).cse()
-            result = resource.list(q=f'{new_destination_name}', cx=cx, searchType='image').execute()
+            images = []
+            for i in range(1,60,10):
+                result = resource.list(q=f'{new_destination_name}', cx=cx, searchType='image', start=i).execute()
+                images += result['items']
             image_links = []
-            for item in result['items']:
-                image_links.append(item['link'])
+            for item in images:
+                if len(image_links) > 9:
+                    break
+                # Check if the image is ok to be saved:
+                try:
+                    urllib.request.urlretrieve(item['link'], "dest_image")
+                    image_links.append(item['link'])
+                except:
+                    image_links = image_links
             print(image_links)
 
             # Get the new destination-ID:
@@ -170,22 +181,19 @@ def save_destination_image(request, dest_id):
         destination_img = data.get("destination_img")
         print(destination_img)
         dest_img_url = destination_img.get("url");
-
+        print(dest_img_url)
         # Retrieve the image from the place_image_url:
         try:
             urllib.request.urlretrieve(dest_img_url, "dest_image")
-        except HTTPError:
+        except:
             return JsonResponse({"error": "Error occured while saving this image. Please select a different image."}, status=403)
 
         #f = open("title_image", newline='', encoding="utf16")
         with open("dest_image", 'rb') as f:
-            myfile = File(f)
-
-            print(myfile.name)
-            print(myfile.size)
+            myDestFile = File(f)
 
             fs = FileSystemStorage()
-            name = fs.save(myfile.name, myfile)
+            name = fs.save(myDestFile.name, myDestFile)
             print(name)
             url = fs.url(name)
             print(url)
@@ -263,42 +271,103 @@ def place_exists(request, place_id):
 
 @csrf_exempt
 @login_required
-def add_place(request):
-    # Posting must be via POST request
-    if request.method != "POST":
-        return JsonResponse({"error": "POST request required."}, status=400)
+def page(request, page_name):
+    return render(request, 'layover_app/index.html', {
+        "api_key": api_key,
+        "page_name": page_name,
+        "place_form": PlaceForm()
+    })
+
+@login_required
+def myPlaces(request):
+    return HttpResponseRedirect(reverse("layover_app:page", kwargs={'page_name': 'myPlaces'}))
+
+@login_required
+def place_url(request, dest_iata, place_id):
+    my_destination = Destination.objects.get(destination_iata = dest_iata)
+    my_destination = my_destination.serialize()
+    print(my_destination["id"])
+    print(place_id)
+    print(dest_iata)
+
+    return render(request, 'layover_app/index.html', {
+        "api_key": api_key,
+        "page_name": "place",
+        "destId": my_destination["id"],
+        "destIata": dest_iata,
+        "placeId": place_id,
+        "place_form": PlaceForm()
+    })
+
+@login_required
+def dest_url(request, dest_iata):
+    my_destination = Destination.objects.filter(destination_iata = dest_iata.upper())
+
+    # Check if a destination exists according URL:
+    if len(my_destination) > 0:
+        my_destination = my_destination[0].serialize()
+        print(my_destination)
+        return render(request, 'layover_app/index.html', {
+            "api_key": api_key,
+            "page_name": "destination",
+            "destId": my_destination["id"],
+            "destIata": dest_iata,
+            "place_form": PlaceForm()
+        })
     else:
-        data = json.loads(request.body)
-        print(data)
-        place = data.get("place")
+        return render(request, 'layover_app/index.html', {
+            "api_key": api_key,
+            "page_name": "destinations",
+            "place_form": PlaceForm()
+        })
+
+@login_required
+def home(request):
+    return HttpResponseRedirect(reverse("layover_app:page", kwargs={'page_name': 'home'}))
+
+@csrf_exempt
+@login_required
+def add_place(request):
+    if request.method == "GET":
+        return HttpResponseRedirect(reverse("layover_app:page", kwargs={'page_name': 'addPlace'}))
+    elif request.method == "POST":
         # Get all the place data:
-        place_name = place.get("place_name")
-        place_destination = Destination.objects.get(pk=int(place.get("place_destination")))
-        place_category = Category.objects.get(pk=int(place.get("place_category")))
-        place_subcategory = Subcategory.objects.get(pk=int(place.get("place_subcategory")))
-        place_google_id = place.get("place_google_id")
-        place_rating = place.get("place_rating")
-        place_address = place.get("place_address")
-        place_phone = place.get("place_phone")
-        place_website = place.get("place_website")
-        place_googlemaps = place.get("place_googlemaps")
+        place_name = request.POST.get("place_name")
+        place_destination = Destination.objects.get(pk=int(request.POST.get("place_destination")))
+        place_category = Category.objects.get(pk=int(request.POST.get("place_category")))
+        place_subcategory = Subcategory.objects.get(pk=int(request.POST.get("place_subcategory")))
+        place_google_id = request.POST.get("place_google_id")
+        place_rating = request.POST.get("place_rating")
+        place_address = request.POST.get("place_address")
+        place_phone = request.POST.get("place_phone")
+        place_website = request.POST.get("place_website")
+        place_googlemaps = request.POST.get("place_googlemaps")
         place_author = request.user
-        place_infos = place.get("place_infos")
-        place_image_url = place.get("place_image_url")
-        place_image = place.get("place_image")
-        place_lat = place.get("place_lat")
-        place_lng = place.get("place_lng")
+        place_infos = request.POST.get("place_infos")
+        place_image_url = request.POST.get("place_image_url")
+        place_image = request.FILES.get("place_image")
+        place_lat = request.POST.get("place_lat")
+        place_lng = request.POST.get("place_lng")
 
-        print(f"place_image: {place_image}")
+        # If there is an uploaded image, save that as the title image:
+        if place_image:
+            fs = FileSystemStorage()
+            name = fs.save(place_image.name, place_image)
+            print(name)
+            url = fs.url(name)
+            print(url)
+            place_image_url = "/layover_app" + url
+            print(f'place_image_url: {place_image_url}')
 
-        # Retrieve the image from the place_image_url and save it in the database:
-        # Retrieve the image from the place_image_url:
-        if place_image_url:
+        # Otherwise:
+        # Retrieve the image from the place_image_url and save it as the title image:
+        elif place_image_url:
+            print(place_image_url)
             urllib.request.urlretrieve(place_image_url, "title_image")
 
             #f = open("title_image", newline='', encoding="utf16")
-            with open("title_image", 'rb') as f:
-                myfile = File(f)
+            with open("title_image", 'rb') as g_img:
+                myfile = File(g_img)
 
                 print(myfile.name)
                 print(myfile.size)
@@ -318,20 +387,21 @@ def add_place(request):
 
         # Check if place already in database:
         # The first if-clause checks if there is a google id at all:
+        print(place_google_id)
         if place_google_id:
-            # If there is a google_id, then check if that google_id already exists in the database
-            if len(Place.objects.filter(place_google_id = place_google_id)) > 0:
-                return JsonResponse({"message": "Sorry, this place already exists in our database."}, status=409)
-            else:
-                new_place = Place(place_name = place_name, place_destination = place_destination, place_category = place_category, place_subcategory = place_subcategory, place_google_id = place_google_id, place_address = place_address, place_phone = place_phone, place_website = place_website, place_googlemaps = place_googlemaps, place_author = place_author, place_infos = place_infos, place_image_url = place_image_url, place_status = True, place_lat = place_lat, place_lng = place_lng)
-                new_place.save()
-
-                return JsonResponse({"message": "Successully submitted place. Thanks."}, status=201)
-        else:
             new_place = Place(place_name = place_name, place_destination = place_destination, place_category = place_category, place_subcategory = place_subcategory, place_google_id = place_google_id, place_address = place_address, place_phone = place_phone, place_website = place_website, place_googlemaps = place_googlemaps, place_author = place_author, place_infos = place_infos, place_image_url = place_image_url, place_status = True, place_lat = place_lat, place_lng = place_lng)
             new_place.save()
 
             return JsonResponse({"message": "Successully submitted place. Thanks."}, status=201)
+        else:
+            print(place_phone)
+            new_place = Place(place_name = place_name, place_destination = place_destination, place_category = place_category, place_subcategory = place_subcategory, place_google_id = None, place_address = place_address, place_phone = place_phone, place_website = place_website, place_googlemaps = place_googlemaps, place_author = place_author, place_infos = place_infos, place_image_url = place_image_url, place_status = True, place_lat = place_lat, place_lng = place_lng)
+            new_place.save()
+
+            return JsonResponse({"message": "Successully submitted place. Thanks."}, status=201)
+
+    else:
+        return JsonResponse({"error": "POST or GET request required."}, status=400)
 
 @csrf_exempt
 @login_required

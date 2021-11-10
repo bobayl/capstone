@@ -3,6 +3,12 @@
 
 {% block body %}
 
+{{ destIata|json_script:"destIata" }}
+{{ page_name|json_script:"page_name" }}
+{{ destId|json_script:"destId" }}
+{{ placeId|json_script:"placeId" }}
+{{ api_key|json_script:"api_key"}}
+
 {% if user.is_authenticated %}
 
 <!-- Destinations -->
@@ -11,7 +17,7 @@
     <div class="row py-lg-5" id="destinations_subheader">
       <div class="col-lg-6 col-md-8 mx-auto">
         <h1 class="fw-light">The Destinations</h1>
-        <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+        <p class="lead text-muted">Below you can browse the destinations and their selected places like restaurants, bars, excursions an more! The destination you are looking for is not there yet? Feel free to add a new destination and contribute to the community with your favorite picks!</p>
         <p>
           <a href="#" class="btn btn-primary my-2" onclick="save_new_destination()">Create New Destination</a>
           <!--<a href="#" class="btn btn-secondary my-2">Pick Destination on Map</a>-->
@@ -201,7 +207,7 @@
               <input id="modal_category" type="text" class="form-control" required="required" placeholder="Category" aria-label="" disabled>
             </div>
             <div class="col">
-              <input id="new_subcategory" type="text" class="form-control" required="required" placeholder="New Subcategory" aria-label="" maxlength="15">
+              <input id="new_subcategory" type="text" class="form-control" required="required" placeholder="New Subcategory" aria-label="" maxlength="30">
             </div>
           </div>
         </div>
@@ -327,7 +333,7 @@
         <form id="add_destination_form" class="" action="{% url 'layover_app:add_destination' %}" method="post">
           <div class="row g-3">
             <div class="col">
-              <input id="new_destination_name" name="new_destination_name" type="text" class="form-control" required="required" placeholder="Destination" aria-label="" maxlength="20">
+              <input id="new_destination_name" name="new_destination_name" type="text" class="form-control" required="required" placeholder="Destination" aria-label="" maxlength="30">
             </div>
             <div class="col">
               <input id="new_destination_iata" name="new_destination_iata" type="text" class="form-control" required="required" placeholder="IATA 3-letter Code" aria-label="" maxlength="3">
@@ -342,9 +348,13 @@
           <div class="alert alert-warning" role="alert" id="image_error">
             There was a problem saving the selected image. Please select a different one.
           </div>
-          <div class="spinner-border text-secondary centered" role="status" id="spinner">
-            <span class="visually-hidden">Loading...</span>
+          <div id="spinner">
+            <div class="d-flex align-items-center">
+              <strong>Browsing the web for images...</strong>
+              <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+            </div>
           </div>
+
           <div class="" id="destination_images_modal">
           </div>
         </div>
@@ -444,10 +454,10 @@
 
 <!-- Gallery Modal -->
 <div class="modal fade" id="gallery_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Gallery</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -478,63 +488,36 @@
   <p style="font-size: 300px; text-align: center;">&#127757</p>
 </div>
 
-  <!-- Destinations -->
-    <div id="destinations">
-      <section class="py-5 text-center container" id="destinations_header">
-        <div class="row py-lg-5" id="destinations_subheader">
-          <div class="col-lg-6 col-md-8 mx-auto">
-            <h1 class="fw-light">The Destinations</h1>
-            <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
-            <p>
-              <a href="#" class="btn btn-primary my-2" onclick="save_new_destination()">Create New Destination</a>
-              <a href="#" class="btn btn-secondary my-2">Pick Destination on Map</a>
-              <div id="destination_select_container" class="">
-                <select id="destination_selector" class="form-select" aria-label="Default select example">
-                  <option selected>Select Destination</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </select>
-              </div>
-            </p>
+<!-- Destinations -->
+<div id="destinations">
+  <section class="py-5 text-center container" id="destinations_header">
+    <div class="row py-lg-5" id="destinations_subheader">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">The Destinations</h1>
+        <p class="lead text-muted">Below you can browse the destinations and their selected places like restaurants, bars, excursions an more! The destination you are looking for is not there yet? Feel free to add a new destination and contribute to the community with your favorite picks!</p>
+        <p class="lead text-muted">Please log in to have full access and to contribute by adding your hidden gems!</p>
+        <p>
+          <div id="destination_select_container" class="">
+            <select id="destination_selector" class="form-select" aria-label="Default select example">
+              <option selected>Select Destination</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
           </div>
-        </div>
-      </section>
-
-      <div class="album py-5 bg-light">
-        <div class="container">
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="destinations_container">
-          </div>
-        </div>
+        </p>
       </div>
     </div>
+  </section>
 
-  <!-- Destination -->
-    <div id="places">
-      <section class="py-5 text-center container" id="destinations_header">
-        <div class="row py-lg-5" id="destinations_subheader">
-          <div class="col-lg-6 col-md-8 mx-auto">
-            <h1 class="fw-light" id="destination_title">The Destinations</h1>
-            <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
-            <p>
-              <a href="#" class="btn btn-primary my-2" id="create_place_for_destination">Create New Place</a>
-              <a href="#" class="btn btn-secondary my-2">See Places on Map</a>
-              <div id="category_select_container" class="">
-                <select id="category_selector" class="form-select" aria-label="Default select example">
-                  <option selected>Select Category</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </select>
-              </div>
-            </p>
-          </div>
-        </div>
-      </section>
-      <div class="" id="places_container">
-
+  <div class="album py-5 bg-light">
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" id="destinations_container">
       </div>
     </div>
+  </div>
+</div>
+
 {% endif %}
 
 
@@ -542,9 +525,7 @@
 
 {% block script %}
   <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=api_key&callback=initMap&libraries=places&v=weekly"
-    async
-  ></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&libraries=places&v=weekly" async></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
   <script type="text/javascript" src="{% static 'layover_app/layover.js' %}"></script>
   <script type="text/javascript" src="{% static 'layover_app/google_maps.js' %}"></script>

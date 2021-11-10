@@ -48,7 +48,11 @@ small {
 
 /* Always set the map height explicitly to define the size of the div
  * element that contains the map. */
-
+#spinner{
+  margin-top: 50px!important;
+  width: 50%;
+  margin: auto;
+}
 #place_info {
   color: black;
   font-size: 14px;
@@ -149,6 +153,10 @@ background-color: lightblue;
 
 .reset-text, .reset-form {
   text-align: center;
+}
+
+.modal-body {
+    max-height: 80vh; overflow-y: auto;
 }
 
 #destinations_header {
@@ -311,7 +319,7 @@ background-color: lightblue;
   font-size: 16px;
 }
 .text-muted {
-  font-size: 12px;
+  font-size: 16px;
   color: black;
 }
 .lead {
@@ -331,7 +339,7 @@ background-color: lightblue;
   margin-top: 5px;
 }
 .form-label {
-  
+
 }
 
 .form-block {

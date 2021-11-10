@@ -2,20 +2,16 @@
 var infowindows;
 var markers;
 
-// When back arrow is clicked, show previous section
-
-window.onpopstate = function(event) {
-    //console.log(event.state.page);
-    //showSection(event.state.section);
-    //console.log(event);
-    if (event.state) {
-      show_page(event.state.page);
-    }
-}
 
 
 // Load the DOM and attach the event listeners to the menu items:
 document.addEventListener('DOMContentLoaded', function() {
+  //
+  const page_name = JSON.parse(document.getElementById("page_name").textContent);
+  const destId = JSON.parse(document.getElementById("destId").textContent);
+  const destIata = JSON.parse(document.getElementById("destIata").textContent);
+  const placeId = JSON.parse(document.getElementById("placeId").textContent);
+  //
   document.querySelector('#start_page').style.display = "none";
   document.querySelector('#destinations').style.display = "none";
   if (document.querySelector('#places')) {
@@ -33,63 +29,100 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Start with showing all destinations:
   show_destinations();
+  // Check if there is a page_name requested (from a direct url entry):
+  if (page_name) {
+    if (page_name == "addPlace"){
+      add_place();
+      history.replaceState({page:"addPlace"}, "", "/layover_app/addPlace");
+    } else if (page_name == "home"){
+      show_start_page();
+      history.replaceState({page:"home"}, "", "/layover_app/home");
+    } else if (page_name == "myPlaces"){
+      my_places();
+      history.replaceState({page:"myPlaces"}, "", "/layover_app/myPlaces");
+    } else if (page_name == "place") {
+      load_place(placeId, destId, destIata);
+      history.replaceState({page:"place"}, "", `/layover_app/destinations/${destIata}/${placeId}`);
+    } else if (page_name == "destination") {
+      show_destination(destId, destIata);
+      history.replaceState({page:"dest"}, "", `/layover_app/destinations/${destIata}`);
+    } else {
+      show_destinations();
+    }
+  }
 
   // Toggle with Nav-Bar-Links:
   if (document.querySelector('#add_new')) {
     document.querySelector('#add_new_menue').addEventListener('click', () => {
       // Add the current state to the history
-      history.pushState({page: "addPlace"}, "", "addPlace");
+      history.pushState({page: "addPlace"}, "", "/layover_app/addPlace");
       add_place();
     });
   }
   document.querySelector('#show_start_page').addEventListener('click', () => {
     // Add the current state to the history
-    history.pushState({page: "start"}, "", "start");
+    history.pushState({page: "start"}, "", "/layover_app/home");
     show_start_page();
   });
   document.querySelector('#destinations_view').addEventListener('click', () => {
     // Add the current state to the history
-    history.pushState({page: "destinations"}, "", "destinations");
+    history.pushState({page: "destinations"}, "", "/layover_app/destinations");
     show_destinations();
   });
   if (document.querySelector('#my_places')) {
     document.querySelector('#show_my_places').addEventListener('click', () => {
       // Add the current state to the history
-      history.pushState({page: "myPlaces"}, "", "myPlaces");
+      history.pushState({page: "myPlaces"}, "", "/layover_app/myPlaces");
       my_places();
     });
   }
   if (document.querySelector('#news_page')) {
     document.querySelector('#news_page').addEventListener('click', () => {
       // Add the current state to the history
-      history.pushState({page: "newest"}, "", "newest");
+      history.pushState({page: "newest"}, "", "/layover_app/newest");
       show_newest();
     });
   }
 });
 
-//************************************
-// Show a page with the newest added places:
-//************************************
-function show_newest() {
-  console.log("in here");
-  //document.querySelector('#newest').style.display = "block";
-}
+// When back arrow is clicked, show previous section
+window.onpopstate = function(event) {
+  //showSection(event.state.section);
+  if (event.state.page) {
+    show_page(event.state.page);
+    console.log("showing page " + event.state.page);
+  } else if (event.state.dest) {
+    show_destination(event.state.dest, event.state.dest_iata);
 
+    console.log("showing destination " + event.state.dest_iata);
+  }
+}
 //************************************
 // Function to call pages according history:
 //************************************
 function show_page(page) {
-  //console.log("going to page " + page);
   if (page === "addPlace") {
     add_place();
   } else if (page === "start") {
     show_start_page();
   } else if (page === "myPlaces") {
     my_places();
+  } else if (page === "newest") {
+    show_newest();
+  } else if (page === "destinations") {
+    show_destinations();
   } else {
     show_destinations();
   }
+}
+
+//************************************
+// Show a page with the newest added places:
+//************************************
+function show_newest() {
+
+  console.log("in here");
+  //document.querySelector('#newest').style.display = "block";
 }
 
 //************************************
@@ -117,6 +150,8 @@ function show_start_page() {
 // Show the destinations overview:
 //************************************
 function show_destinations() {
+  // Add the current state to the history
+  history.replaceState({page: "destinations"}, "", "/layover_app/destinations");
   // Display the destinations div:
   document.querySelector('#destinations').style.display = "block";
   document.querySelector('#start_page').style.display = "none";
@@ -134,7 +169,7 @@ function show_destinations() {
   }
 
   // Fetch all the stored destinations from the server:
-  fetch('show_destinations', {
+  fetch('/layover_app/show_destinations', {
     method: 'GET'
   })
   .then(response => response.json())
@@ -189,6 +224,7 @@ function show_destinations() {
       //destination_tile.style.backgroundImage = `url(${destination.destination_img})`;
       let destination_title = document.createElement('h3');
       let destination_id = destination.id;
+      let destination_iata = destination.destination_iata;
       destination_title.innerHTML = destination.destination_name;
       destination_title.className = "centered";
       destination_tile.onmouseover = function(){
@@ -198,7 +234,8 @@ function show_destinations() {
         this.style = "opacity: 100%";
       };
       destination_tile.onclick = function() {
-        show_destination(destination_id);
+        history.pushState({dest: destination_id, dest_iata: destination_iata}, "", `/layover_app/destinations/${destination_iata}`);
+        show_destination(destination_id, destination_iata);
       };
       destination_title.onmouseover = function() {
         this.style = "cursor: pointer";
@@ -241,6 +278,7 @@ function save_new_destination(){
     document.querySelector('#destination_images_modal_container').style.display = "block";
     document.querySelector('#destination_images_modal').style.display = "block";
     document.querySelector('#destination_images_modal').innerHTML = "";
+    document.querySelector('#spinner').style.display = "block";
     // Read the entered values:
     // Fill the object:
     new_destination.destination_name = document.querySelector('#new_destination_name').value;
@@ -251,7 +289,7 @@ function save_new_destination(){
 
     // When all checks pass:
     // Send it to the server:
-    let route = 'add_destination';
+    let route = '/layover_app/add_destination';
     fetch(route, {
       method: 'POST',
       body: JSON.stringify({
@@ -259,6 +297,9 @@ function save_new_destination(){
       })
     })
     .then(response => {
+      if(response){
+        console.log("got response");
+      }
       // Check if the destination already exists in the database:
       if (response.status == 409) {
         document.querySelector('#destination_conflict').style.display = "block";
@@ -266,14 +307,14 @@ function save_new_destination(){
       return response.json();
     })
     .then(data => {
-      console.log(data);
+      // When the response comes in, hide the spinner
+      document.getElementById('spinner').style.display = "none";
       if (data["status"] === 201) {
 
         // If the place is successfully created with name and iata code, go to the destination image picker:
         //display the photos:
         let image_links = data.image_links;
         let dest_id = data.destination_id;
-        console.log(dest_id);
         document.querySelector('#save_destination').innerHTML = "Save Destination";
         document.querySelector('#destination_images_modal').innerHTML = "";
 
@@ -290,7 +331,7 @@ function save_new_destination(){
           tile_image.alt = "Image " + (i+1);
           tile_image.id = "image" + i;
           tile_image.onclick = function() {
-            title_image_url = this.src;
+            let dest_image_url = this.src;
             for (let j=0; j<image_links.length; j++){
               document.querySelector(`#image${j}`).style = "border: none";
             }
@@ -300,8 +341,7 @@ function save_new_destination(){
               ///// TODO
               this.disabled = true;
 
-
-              save_destination_image(title_image_url, dest_id, destination_modal);
+              save_destination_image(dest_image_url, dest_id, destination_modal);
             }
           }
           dest_photo_tile.appendChild(tile_image);
@@ -312,8 +352,6 @@ function save_new_destination(){
   }
 }
 function save_destination_image(img_url, dest_id, dest_modal) {
-  console.log("saving destination image...");
-  console.log(img_url);
   document.querySelector('#spinner').style.display = "block";
 
   const destination_img = {};
@@ -321,7 +359,7 @@ function save_destination_image(img_url, dest_id, dest_modal) {
 
   // onclick send the selected image url to the server:
   document.querySelector('#spinner').style.display = "block";
-  let route = `save_destination_image/${dest_id}`;
+  let route = `/layover_app/save_destination_image/${dest_id}`;
   fetch(route, {
     method: 'POST',
     body: JSON.stringify({
@@ -338,7 +376,6 @@ function save_destination_image(img_url, dest_id, dest_modal) {
   })
   .then(data => {
     document.querySelector('#spinner').style.display = "block";
-    console.log(data);
     // If the destination is added from the destinations page:
     if (document.querySelector('#destinations').style.display == "block"){
       show_destinations();
@@ -356,7 +393,7 @@ function save_destination_image(img_url, dest_id, dest_modal) {
 //************************************************************************
 function update_destination_selector(){
   // Asynchronously adjust the destination selector:
-  fetch('show_destinations')
+  fetch('/layover_app/show_destinations')
   .then(response => response.json())
   .then(data => {
     // Clear the selector:
@@ -385,9 +422,8 @@ function update_destination_selector(){
 //************************************
 // Show the places of a destination:
 //************************************
-function show_destination(destination_id) {
-  // Add the current state to the history
-  history.pushState({page: "destination"}, "", destination_id);
+function show_destination(destination_id, destination_iata) {
+
   document.querySelector('#destinations').style.display = "none";
   if (document.querySelector('#place_details')) {
     document.querySelector('#place_details').style.display = "none";
@@ -401,17 +437,22 @@ function show_destination(destination_id) {
   }
 
   // Hide the places-map:
-  document.querySelector('#places_map').style.display = "none";
+  if (document.querySelector('#places_map')){
+    document.querySelector('#places_map').style.display = "none";
+  }
 
   // fetch all the places for the selected destination:
-  let route = `show_destination/${destination_id}`;
+  //history.replaceState(null, null, "");
+  let route = `/layover_app/show_destination/${destination_id}`;
   fetch(route, {
     method: 'GET'
   })
   .then(response => {
     if (response.status === 401) {
-      window.location.replace("login_view");
+      console.log("in here");
+      window.location.replace("/layover_app/login_view");
     }
+    console.log(response.status);
     return response.json();
   })
   .then(data => {
@@ -431,11 +472,12 @@ function show_destination(destination_id) {
       document.querySelector("#destination_title").innerHTML = destination["destination_name"];
 
       // List all places:
-      list_places(places, categories, destination_id);
+      list_places(places, categories, destination_id, destination_iata);
+      //history.pushState({page: destination_id}, "", `destinations/${destination_id}`)
     }
   });
 }
-function list_places(places, categories, destination_id) {
+function list_places(places, categories, destination_id, destination_iata) {
   // Add the map option to the respective button:
   document.querySelector('#places_on_map_button').onclick = function() {
     show_places_on_map(places);
@@ -464,8 +506,6 @@ function list_places(places, categories, destination_id) {
     // If the current view is the list view, scroll to the respective places
     // If the current view is the map view, filter the places
     if (document.querySelector('#places_map').style.display === "none") {
-      console.log(selected_category_value);
-      console.log(anchor);
       document.querySelector(anchor).scrollIntoView();
     } else {
       // Filter the places for the selected category:
@@ -531,7 +571,7 @@ function list_places(places, categories, destination_id) {
         place_card.id = place.id;
         place_card.name = place.place_name;
 
-        place_card.addEventListener('click', load_place.bind(this, place.id, place.place_destination_id), false);
+        place_card.addEventListener('click', load_place.bind(this, place.id, place.place_destination_id, destination_iata), false);
 
         card_group.appendChild(place_card);
       }
@@ -544,7 +584,10 @@ function list_places(places, categories, destination_id) {
 //************************************
 // Load place function:
 //************************************
-function load_place(place_id, destination_id) {
+function load_place(place_id, destination_id, destination_iata) {
+
+  // Add the current state to the history
+  history.pushState({page: "place"}, "", `/layover_app/destinations/${destination_iata}/${place_id}`);
   // Display the place details block:
   document.querySelector('#start_page').style.display = "none";
   document.querySelector('#destinations').style.display = "none";
@@ -562,21 +605,20 @@ function load_place(place_id, destination_id) {
 
 
   // Fetch the place details:
-  let route = `load_place/${place_id}`;
-  console.log(route);
+
+  let route = `/layover_app/load_place/${place_id}`;
   fetch(route)
   .then(response => response.json())
   .then(data => {
     let place = data.place;
-    console.log(place);
     let is_editable = data.is_editable;
 
     // Update the back button:
     let back_to_destination_button = document.querySelector('#back_to_destination_button');
     back_to_destination_button.innerHTML = `Back to destination ${place.place_destination}`;
     back_to_destination_button.onclick = function() {
-      console.log(`back to destination ${destination_id}`);
-      show_destination(destination_id);
+      show_destination(destination_id, destination_iata);
+      history.pushState({dest: destination_id, dest_iata: destination_iata}, "", `/layover_app/destinations/${destination_iata}`);
     }
     // Update the title:
     document.querySelector('#place_title').innerHTML = place.place_name;
@@ -661,12 +703,11 @@ function load_place(place_id, destination_id) {
 
     // Load the comments:
     load_comments(place_id);
-  })
-  // Add the current state to the history
-  //history.pushState({page: "place"}, "", place_id);
+    //history.pushState({page: place_id, dest: destination_id}, "", `destinations/${destination_id}/${place_id}`);
+  });
 }
 function load_comments(place_id) {
-  let route = `comment_place/${place_id}`;
+  let route = `/layover_app/comment_place/${place_id}`;
   fetch(route, {
     method: "GET"
   })
@@ -691,7 +732,6 @@ function load_comments(place_id) {
       comment_container.appendChild(empty_comments);
     } else {
       for (comment of comments) {
-        console.log(comment.author);
         let comment_card = document.createElement('div');
         comment_card.className = "card text-dark bg-light mb-3";
         comment_card.id = "comment";
@@ -728,7 +768,6 @@ function open_gallery(i, place_photos) {
     let slide_img = document.createElement('img');
     slide_img.className = "d-block w-100";
     slide_img.src = `${photo}`;
-    //console.log(slide_img);
     slide_img.alt = "...";
     // Append image to the slide:
     slide.appendChild(slide_img);
@@ -877,6 +916,7 @@ function add_place() {
       // If both destination and categories are selected, then submit the place:
       if (place_name.value && category.value && destination.value && subcategory.value) {
         submit_place(new_place);
+        new_place = {};
       }
     });
   });
@@ -890,7 +930,7 @@ function update_subcategory() {
   let selected_subcategory = document.getElementById("id_place_subcategory");
   // Check if a category is selected:
   if (selected_category > 0) {
-    let route = `load_subcategories/${selected_category}`;
+    let route = `/layover_app/load_subcategories/${selected_category}`;
     fetch(route)
     .then(response => response.json())
     .then(data => {
@@ -908,6 +948,7 @@ function update_subcategory() {
         option.innerHTML = sub.subcategory_name;
         selected_subcategory.append(option);
       }
+
       // If the desired subcategory is not listed, a new one can be created:
       option = document.createElement('option');
       option.value = "new";
@@ -948,7 +989,7 @@ function add_subcategory() {
     let new_subcategory = document.querySelector('#new_subcategory').value;
     let category = sel.options[sel.selectedIndex].value;
 
-    fetch('add_subcategory', {
+    fetch('/layover_app/add_subcategory', {
       method: 'POST',
       body: JSON.stringify({
         category: category,
@@ -974,16 +1015,15 @@ function submit_place(place) {
   place.place_category = document.getElementById("id_place_category").value;
   place.place_subcategory = document.getElementById("id_place_subcategory").value;
   place.place_infos = document.getElementById("id_place_infos").value;
+  place.place_phone = document.getElementById("id_place_phone").value;
+  place.place_email = document.getElementById("id_place_email").value;
+  place.place_website = document.getElementById("id_place_website").value;
+  place.place_address = document.getElementById("id_place_address").value;
+  
   // This may be empty:
   place.place_image_url = title_image_url;
   // For image upload from the own device:
-  let input = document.querySelector('input[type="file"]')
-  let place_image = input.files[0];
-  let place_data = JSON.stringify({place: place});
 
-  console.log(place);
-  console.log(input.files[0]);
-  console.log(JSON.stringify({place: place}))
 
   // Check if destination and category are selected:
   let destination_field = document.getElementById("id_place_destination");
@@ -991,12 +1031,16 @@ function submit_place(place) {
   if (!place.place_destination || !place.place_category) {
     alert("please select destination and category");
   } else {
-    
-    fetch('add_place', {
+    const formData = new FormData();
+    const fileField = document.querySelector('input[type="file"]');
+    for (const[key, value] of Object.entries(place)) {
+      formData.append(`${key}`, `${value}`);
+    }
+    formData.append('place_image', fileField.files[0]);
+    console.log(formData);
+    fetch('/layover_app/add_place', {
       method: 'POST',
-      body: JSON.stringify({
-        place: place
-      })
+      body: formData
     })
     .then(response => {
       if (response.status == 201){
@@ -1026,6 +1070,7 @@ function submit_place(place) {
 // Function to list my places sorted by destination:
 //************************************
 function my_places() {
+
   // Clear the content:
   document.querySelector('#my_places_list').innerHTML = "";
   // Display the destinations div:
@@ -1037,13 +1082,11 @@ function my_places() {
   document.querySelector('#my_places').style.display = "block";
 
   // Fetch the users places from the server:
-  fetch('my_places')
+  fetch('/layover_app/my_places')
   .then(response => response.json())
   .then(data => {
     let my_destinations = data.my_destinations;
-    //console.log(data);
     let my_places = data.my_places;
-    console.log(my_places);
     // Loop over the categories:
     for (destination of my_destinations) {
       // Create a category container:
@@ -1099,10 +1142,8 @@ function my_places() {
           place_card.id = place.id;
           place_card.name = place.place_name;
 
-          console.log(place.place_destination_id);
           place_card.onclick = function() {
             // Load the place:
-            console.log(place_destination_id);
             load_place(place_card.id, place_destination_id);
           }
           card_group.appendChild(place_card);
@@ -1118,7 +1159,6 @@ function my_places() {
 // Edit Place (and delete Place) :
 //************************************
 function edit_place(place) {
-  console.log(place);
   // Pop up the modal to edit the place:
   const edit_modal = new bootstrap.Modal(document.getElementById('edit_place_modal'), backdrop=true);
   // Set the modal title:
@@ -1153,22 +1193,19 @@ function edit_place(place) {
   }
 }
 function delete_place(place) {
-  console.log("deleting place...");
-  let route = `delete_place/${place.id}`;
+  let route = `/layover_app/delete_place/${place.id}`;
   fetch(route, {
     method: 'DELETE'
   })
   .then(response => response.json)
   .then(data => {
-    console.log(data);
     show_destination(place.place_destination_id);
   })
 }
 function update_destinations_and_categories(place) {
-  fetch('update_destinations_and_categories')
+  fetch('/layover_app/update_destinations_and_categories')
   .then(response => response.json())
   .then(data => {
-    console.log(data);
     // Extract the data:
     let destinations = data.destinations;
     let categories = data.categories;
@@ -1248,7 +1285,7 @@ function send_edit(place_id) {
   updated_place.subcat_update = subcategory_update;
   updated_place.infos_update = infos_update;
 
-  let route = `update_place/${place_id}`;
+  let route = `/layover_app/update_place/${place_id}`;
   fetch(route, {
     method: 'POST',
     body: JSON.stringify({
@@ -1257,7 +1294,6 @@ function send_edit(place_id) {
   })
   .then(response => response.json())
   .then(data => {
-    console.log(data);
     // Reload the place:
     load_place(data.place.id, data.place.place_destination_id);
   })
@@ -1287,10 +1323,8 @@ function comment_place(place) {
   }
 }
 function save_comment(place_id, comment_text) {
-  console.log(place_id);
-  console.log(comment_text);
 
-  let route = `comment_place/${place_id}`
+  let route = `/layover_app/comment_place/${place_id}`
   fetch(route, {
     method: 'POST',
     body: JSON.stringify({
@@ -1299,7 +1333,6 @@ function save_comment(place_id, comment_text) {
   })
   .then(response => response.json())
   .then(data => {
-    console.log(data);
     load_comments(place_id);
   })
 }
@@ -1347,7 +1380,6 @@ function show_places_on_map(places) {
   let place_id = 0;
 
   for (place of places) {
-    //console.log(place);
 
     // if the place has coordinates, create a marker and infowindow:
     if (place.place_lat !== null) {

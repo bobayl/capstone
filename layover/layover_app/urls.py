@@ -13,6 +13,12 @@ urlpatterns = [
     path("logout_view", views.logout_view, name="logout_view"),
     path("register", views.register, name="register"),
     path("add_place", views.add_place, name="add_place"),
+    path("addPlace", views.add_place, name="addPlace"),
+    path("myPlaces", views.myPlaces, name="myPlaces"),
+    path("home", views.home, name="home"),
+    path("page/<str:page_name>", views.page, name="page"),
+    path("destinations/<str:dest_iata>/<int:place_id>", views.place_url, name="place_url"),
+    path("destinations/<str:dest_iata>", views.dest_url, name="dest_url"),
 
     # API Routes:
     path("show_destinations", views.show_destinations, name="show_destinations"),

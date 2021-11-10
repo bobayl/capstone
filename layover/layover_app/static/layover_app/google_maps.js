@@ -17,144 +17,146 @@
 //const api_key = "my_api_key";
 
 // Declare an empty object for the place:
-const new_place = {};
+var new_place = {};
 // Variable for the selected title image of a new place:
 var title_image_url = "";
 
 function initMap() {
-  // Create the map:
-  const map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 47.00, lng: 8.25 },
-    zoom: 10,
-    mapId: "58fbe1d4b7afdb78"
-  });
+  if (document.getElementById("map")) {
+    // Create the map:
+    const map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: 47.00, lng: 8.25 },
+      zoom: 2,
+      mapId: "58fbe1d4b7afdb78"
+    });
 
 
-  const card = document.getElementById("pac-card");
-  const input = document.getElementById("pac-input");
-  const biasInputElement = document.getElementById("use-location-bias");
-  const strictBoundsInputElement = document.getElementById("use-strict-bounds");
-  const options = {
-    fields: [
-      "name",
-      "formatted_address",
-      "rating",
-      "place_id",
-      "international_phone_number",
-      "website",
-      "url",
-      "business_status",
-      "geometry"
-    ],
-    origin: map.getCenter(),
-    strictBounds: false,
-    types: ["establishment"],
-  };
-  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(card);
-  const autocomplete = new google.maps.places.Autocomplete(input, options);
+    const card = document.getElementById("pac-card");
+    const input = document.getElementById("pac-input");
+    const biasInputElement = document.getElementById("use-location-bias");
+    const strictBoundsInputElement = document.getElementById("use-strict-bounds");
+    const options = {
+      fields: [
+        "name",
+        "formatted_address",
+        "rating",
+        "place_id",
+        "international_phone_number",
+        "website",
+        "url",
+        "business_status",
+        "geometry"
+      ],
+      origin: map.getCenter(),
+      strictBounds: false,
+      types: ["establishment"],
+    };
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(card);
+    const autocomplete = new google.maps.places.Autocomplete(input, options);
 
-  // Bind the map's bounds (viewport) property to the autocomplete object,
-  // so that the autocomplete requests use the current map bounds for the
-  // bounds option in the request.
-  autocomplete.bindTo("bounds", map);
-  const infowindow = new google.maps.InfoWindow();
-  const infowindowContent = document.getElementById("infowindow-content");
-  infowindow.setContent(infowindowContent);
-  const marker = new google.maps.Marker({
-    map,
-    anchorPoint: new google.maps.Point(0, -29),
-  });
-  autocomplete.addListener("place_changed", () => {
-    document.querySelector("#map").style.display = "block";
-    document.querySelector('#place_add_success').style.display = "none";
-    document.querySelector('#place_exists').style.display = "none";
-    infowindow.close();
-    marker.setVisible(false);
-    const place = autocomplete.getPlace();
-    console.log(place.geometry.location.toJSON());
+    // Bind the map's bounds (viewport) property to the autocomplete object,
+    // so that the autocomplete requests use the current map bounds for the
+    // bounds option in the request.
+    autocomplete.bindTo("bounds", map);
+    const infowindow = new google.maps.InfoWindow();
+    const infowindowContent = document.getElementById("infowindow-content");
+    infowindow.setContent(infowindowContent);
+    const marker = new google.maps.Marker({
+      map,
+      anchorPoint: new google.maps.Point(0, -29),
+    });
+    autocomplete.addListener("place_changed", () => {
+      document.querySelector("#map").style.display = "block";
+      document.querySelector('#place_add_success').style.display = "none";
+      document.querySelector('#place_exists').style.display = "none";
+      infowindow.close();
+      marker.setVisible(false);
+      const place = autocomplete.getPlace();
+      console.log(place.geometry.location.toJSON());
 
 
-    /////
-    // Get photo references:
-    /////
+      /////
+      // Get photo references:
+      /////
 
-    // Check if the place already exists in the database:
-    let exist_route = `place_exists/${place.place_id}`;
-    fetch(exist_route)
-    .then(response => {
-      if (response.status == 202){
+      // Check if the place already exists in the database:
+      let exist_route = `/layover_app/place_exists/${place.place_id}`;
+      fetch(exist_route)
+      .then(response => {
+        if (response.status == 202){
 
-        // Call function to fill the form with the selected place:
-        fill_form(place);
-        fill_place(place);
-        document.querySelector('#place_images_for_selection_container').style.display = "block";
-        document.querySelector('#place_form').style.display = "block";
+          // Call function to fill the form with the selected place:
+          fill_form(place);
+          fill_place(place);
+          document.querySelector('#place_images_for_selection_container').style.display = "block";
+          document.querySelector('#place_form').style.display = "block";
 
-        // Call the images:
-        const place_photos = [];
-        const service = new window.google.maps.places.PlacesService(map);
-        service.getDetails(
-          {
-            placeId: `${place.place_id}`
-          },
-          (data, status) => {
-            if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-              data.photos &&
-                data.photos.forEach(photo => {
-                  place_photos.push(photo.getUrl());
-                });
+          // Call the images:
+          const place_photos = [];
+          const service = new window.google.maps.places.PlacesService(map);
+          service.getDetails(
+            {
+              placeId: `${place.place_id}`
+            },
+            (data, status) => {
+              if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+                data.photos &&
+                  data.photos.forEach(photo => {
+                    place_photos.push(photo.getUrl());
+                  });
 
-                //display the photos:
-                document.querySelector('#place_images_for_selection').innerHTML = "";
-                for (let i=0; i<place_photos.length; i++) {
-                  let place_photo_tile = document.createElement('div');
-                  place_photo_tile.className = "card shadow-sm";
-                  let tile_image = document.createElement('img');
-                  tile_image.src = `${place_photos[i]}`;
-                  tile_image.className = "card-img-top";
-                  tile_image.id = "image" + i;
-                  tile_image.alt = "Image " + (i+1);
-                  tile_image.onclick = function() {
-                    title_image_url = this.src;
-                    for (let j=0; j<place_photos.length; j++){
-                      document.querySelector(`#image${j}`).style = "border: none";
+                  //display the photos:
+                  document.querySelector('#place_images_for_selection').innerHTML = "";
+                  for (let i=0; i<place_photos.length; i++) {
+                    let place_photo_tile = document.createElement('div');
+                    place_photo_tile.className = "card shadow-sm";
+                    let tile_image = document.createElement('img');
+                    tile_image.src = `${place_photos[i]}`;
+                    tile_image.className = "card-img-top";
+                    tile_image.id = "image" + i;
+                    tile_image.alt = "Image " + (i+1);
+                    tile_image.onclick = function() {
+                      title_image_url = this.src;
+                      for (let j=0; j<place_photos.length; j++){
+                        document.querySelector(`#image${j}`).style = "border: none";
+                      }
+                      this.style = "border: solid";
+                      document.querySelector('#selected_image').innerHTML = "Your image selection: " + this.alt;
                     }
-                    this.style = "border: solid";
-                    document.querySelector('#selected_image').innerHTML = "Your image selection: " + this.alt;
+                    place_photo_tile.appendChild(tile_image);
+                    document.querySelector('#place_images_for_selection').appendChild(place_photo_tile);
                   }
-                  place_photo_tile.appendChild(tile_image);
-                  document.querySelector('#place_images_for_selection').appendChild(place_photo_tile);
                 }
-              }
-            });
+              });
 
-      } else {
-        document.querySelector('#place_exists').style.display = "block";
+        } else {
+          document.querySelector('#place_exists').style.display = "block";
+        }
+      })
+
+      if (!place.geometry || !place.geometry.location) {
+        // User entered the name of a Place that was not suggested and
+        // pressed the Enter key, or the Place Details request failed.
+        window.alert("Please select a place from the dropdown menue");
+        return;
       }
-    })
 
-    if (!place.geometry || !place.geometry.location) {
-      // User entered the name of a Place that was not suggested and
-      // pressed the Enter key, or the Place Details request failed.
-      window.alert("Please select a place from the dropdown menue");
-      return;
-    }
+      // If the place has a geometry, then present it on a map.
 
-    // If the place has a geometry, then present it on a map.
-
-    if (place.geometry.viewport) {
-      map.fitBounds(place.geometry.viewport);
-    } else {
-      map.setCenter(place.geometry.location);
-      map.setZoom(13);
-    }
-    marker.setPosition(place.geometry.location);
-    marker.setVisible(true);
-    infowindowContent.children["place-name"].textContent = place.name;
-    infowindowContent.children["place-address"].textContent =
-      place.formatted_address;
-    infowindow.open(map, marker);
-  });
+      if (place.geometry.viewport) {
+        map.fitBounds(place.geometry.viewport);
+      } else {
+        map.setCenter(place.geometry.location);
+        map.setZoom(13);
+      }
+      marker.setPosition(place.geometry.location);
+      marker.setVisible(true);
+      infowindowContent.children["place-name"].textContent = place.name;
+      infowindowContent.children["place-address"].textContent =
+        place.formatted_address;
+      infowindow.open(map, marker);
+    });
+  }
 }
 
 // When place is selected from dropdown, the form will be pre-populated:
