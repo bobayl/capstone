@@ -1,0 +1,370 @@
+body {
+  background-color: white;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 30px;
+  color: black;
+}
+
+h2 {
+  margin-top: 0px;
+  text-align: center;
+  color: grey;
+  padding-top: 100 px;
+}
+
+h3 {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+h5 {
+  color: darkslategrey;
+  text-align: center;
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+
+h6 {
+  font-size: 12px;
+  text-align: center;
+  color: grey;
+}
+
+small {
+  text-align: center;
+  margin: auto;
+}
+
+
+.album {
+  padding: 0px;
+  background-color: white!important;
+}
+
+/* Always set the map height explicitly to define the size of the div
+ * element that contains the map. */
+#spinner{
+  margin-top: 50px!important;
+  width: 50%;
+  margin: auto;
+}
+#place_info {
+  color: black;
+  font-size: 14px;
+}
+
+#add_new {
+  background-color: white;
+  padding: 0px;
+}
+
+
+#place_form, #reset_pwd_form {
+  background-color: white;
+  width: 80%;
+  max-width: 800px;
+  margin: auto;
+}
+
+
+#place_infos_textarea {
+  height: 200px;
+}
+
+#map {
+min-height: 500px;
+width: 90%;
+max-width: 1000px;
+margin: auto;
+margin-top: 20px;
+background-color: lightblue;
+}
+
+#places_map {
+  min-height: 500px;
+  width: 90%;
+  max-width: 1000px;
+  margin: auto;
+  margin-top: 20px;
+  background-color: lightblue;
+}
+
+#infowindow-content {
+  display: none;
+  }
+#places-infowindow-container > div {
+  display: none;
+}
+
+#infowindow-content {
+  display: inline;
+  }
+
+#places_map #places-infowindow-content {
+  display: inline;
+}
+
+#category_title_container {
+  padding: 10px;
+  border-style: solid;
+  border-color: lightgrey;
+  border-width: thin;
+  border-radius: 3px;
+  background-color: white;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 20px;
+}
+
+#search_frame, #search_frame1 {
+  background-color: white;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  max-width: 1000px;
+  width: 90%;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+#pac-input {
+  margin: auto;
+}
+#place_add_button1 {
+  margin: auto;
+}
+#place_add_button2 {
+  margin-top: 0px;
+}
+
+#login_form, #registration_form, #destination_select_container, #reset_pwd_form, #update_pwd_form {
+  background-color: white;
+  padding: 10px;
+  padding-right: 10px;
+  max-width: 1000px;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 0px;
+}
+
+.reset-text, .reset-form {
+  text-align: center;
+}
+
+.modal-body {
+    max-height: 80vh; overflow-y: auto;
+}
+
+#destinations_header {
+  max-height: 500px;
+  margin-top: 0px;
+  padding: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+#destinations_container, #place_images_for_selection, #place_details_images {
+  background-color: white;
+  display: flex;
+  flex-wrap: wrap;
+  margin: auto;
+  padding: 10px;
+  justify-content: center;
+}
+#destinations_container > div {
+  position: relative;
+  text-align: center;
+  width: 200px;
+  height: 150px;
+  margin: 5px;
+  padding: 5px!important;
+  border-style: none;
+  border-width: thin;
+  border-radius: 3px;
+  background-color: lightblue;
+  background-size: 100% 100%;
+}
+#destinations_container > div > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 3px;
+}
+
+
+#place_details_images > div {
+  height: 150px;
+  width: 200px;
+  overflow: hidden;
+  margin: 5px;
+  padding: 5px!important;
+}
+#place_details_images > div > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+#place_images_for_selection > div {
+  height: 150px;
+  width: 200px;
+  overflow: hidden;
+  margin: 5px;
+}
+#place_images_for_selection > div > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+#destination_images_modal {
+  min-height: 200px;
+  background-color: white;
+  display: flex!important;
+  flex-wrap: wrap;
+  margin: auto;
+  padding: 10px;
+  justify-content: center;
+}
+#destination_images_modal > div {
+  height: 150px;
+  width: 20%;
+  overflow: hidden;
+}
+#destination_images_modal > div > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+
+#place_images_for_selection > div:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+#place_data {
+  margin-top: 20px;
+  margin-left: 60px!important;
+  margin-right: 60px!important;
+}
+#place_header {
+  margin-bottom: 20px;
+  height: 600px;
+  width: 100%;
+}
+#place_info_list {
+  margin-top: 20px;
+  margin-left: 60px;
+  margin-right: 60px;
+}
+#place_title_container {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+#comments {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+#comment{
+  margin-left: 60px;
+  margin-right: 60px;
+  max-width: 800px;
+}
+#empty_comments {
+  text-align: center;
+}
+
+#image_error {
+  margin-top: 10px!important;
+}
+
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.list-group-item {
+  text-align: center;
+}
+
+.card {
+  padding: 5px;
+  margin: 10px;
+  max-width: 200px;
+  min-width: 200px;
+
+}
+#card-group {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 150px;
+}
+.card-title {
+  font-size: 16px;
+}
+.text-muted {
+  font-size: 16px;
+  color: black;
+}
+.lead {
+  color: black;
+}
+.card-footer {
+  width: 100%;
+}
+
+/* login and registration styles */
+.login_register {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.form-control, .btn-primary, .form-select, .input-group-text {
+  margin-top: 5px;
+}
+.form-label {
+
+}
+
+.form-block {
+  margin-top: 50px;
+}
+
+.alert {
+  text-align: center;
+  max-width: 1000px;
+  margin: auto;
+}
+#destination_conflict {
+  margin-top: 10px;
+}
+
+.btn {
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+.py-5 {
+  padding-top: 0px!important;
+  padding-bottom: 0px!important;
+}
+
+.nav-link, .navbar-brand {
+  cursor: pointer;
+}
